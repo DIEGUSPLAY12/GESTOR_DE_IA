@@ -17,7 +17,7 @@
         ]
       },
       "registered_skills": [],
-      "installed_at": "2026-06-05T09:39:22.730267+00:00"
+      "installed_at": "2026-06-05T09:50:26.624841+00:00"
     },
     "agent-context": {
       "version": "1.0.0",
@@ -31,7 +31,7 @@
         ]
       },
       "registered_skills": [],
-      "installed_at": "2026-06-05T09:39:22.769896+00:00"
+      "installed_at": "2026-06-05T09:50:26.664587+00:00"
     }
   }
 }
