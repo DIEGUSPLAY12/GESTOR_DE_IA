@@ -1,50 +1,53 @@
-# [PROJECT_NAME] Constitution
-<!-- Example: Spec Constitution, TaskFlow Constitution, etc. -->
+<!--
+Sync Impact Report
+- Version: 1.0.0 (Initial configuration)
+- Modified principles: Applied requested principles for Code Quality, Testing, Architecture, User Experience, Performance, and Security.
+- Added sections: Core Principles I-V, Additional Constraints (VI)
+- Removed sections: Placeholder examples
+- Templates requiring updates: 
+  - ✅ plan-template.md (.specify/templates/plan-template.md) checked and updated.
+  - ✅ spec-template.md (.specify/templates/spec-template.md) compatible and aligned.
+  - ✅ tasks-template.md (.specify/templates/tasks-template.md) compatible and aligned.
+- Follow-up TODOs: Implement CI validation hooks for linters and formatters.
+-->
+
+# Gestor de IA Constitution
 
 ## Core Principles
 
-### [PRINCIPLE_1_NAME]
-<!-- Example: I. Library-First -->
-[PRINCIPLE_1_DESCRIPTION]
-<!-- Example: Every feature starts as a standalone library; Libraries must be self-contained, independently testable, documented; Clear purpose required - no organizational-only libraries -->
+### I. Calidad de Código (MUST)
+- Todo el código sigue las guías de estilo y mejores prácticas del lenguaje, validadas por un linter y un formateador automáticos en CI.
+- Funciones y módulos pequeños y con responsabilidad única; sin código muerto ni duplicación evidente.
+- Sin secretos, claves ni credenciales en el repositorio.
 
-### [PRINCIPLE_2_NAME]
-<!-- Example: II. CLI Interface -->
-[PRINCIPLE_2_DESCRIPTION]
-<!-- Example: Every library exposes functionality via CLI; Text in/out protocol: stdin/args → stdout, errors → stderr; Support JSON + human-readable formats -->
+### II. Testing (MUST)
+- Desarrollo guiado por pruebas: se escribe la prueba antes que la implementación cuando sea viable.
+- Cobertura mínima del 80% con pruebas unitarias y de integración.
+- Toda corrección de bug incluye una prueba de regresión. El build falla si las pruebas no pasan.
 
-### [PRINCIPLE_3_NAME]
-<!-- Example: III. Test-First (NON-NEGOTIABLE) -->
-[PRINCIPLE_3_DESCRIPTION]
-<!-- Example: TDD mandatory: Tests written → User approved → Tests fail → Then implement; Red-Green-Refactor cycle strictly enforced -->
+### III. Arquitectura (MUST)
+- Enfoque "library-first": cada funcionalidad se implementa primero como librería o módulo autónomo y reutilizable.
+- Separación clara entre lógica de negocio, capa de datos e interfaz.
+- Las dependencias externas se aíslan detrás de interfaces para poder sustituirlas.
 
-### [PRINCIPLE_4_NAME]
-<!-- Example: IV. Integration Testing -->
-[PRINCIPLE_4_DESCRIPTION]
-<!-- Example: Focus areas requiring integration tests: New library contract tests, Contract changes, Inter-service communication, Shared schemas -->
+### IV. Experiencia de Usuario (SHOULD)
+- Consistencia visual y de comportamiento en toda la aplicación.
+- Accesibilidad conforme a WCAG 2.1 AA como mínimo.
+- Mensajes de error claros y accionables para el usuario.
 
-### [PRINCIPLE_5_NAME]
-<!-- Example: V. Observability, VI. Versioning & Breaking Changes, VII. Simplicity -->
-[PRINCIPLE_5_DESCRIPTION]
-<!-- Example: Text I/O ensures debuggability; Structured logging required; Or: MAJOR.MINOR.BUILD format; Or: Start simple, YAGNI principles -->
+### V. Rendimiento (SHOULD)
+- Respuestas de API por debajo de 200 ms en el percentil 95.
+- Carga de página por debajo de 2 segundos.
 
-## [SECTION_2_NAME]
-<!-- Example: Additional Constraints, Security Requirements, Performance Standards, etc. -->
+## Restricciones Adicionales
 
-[SECTION_2_CONTENT]
-<!-- Example: Technology stack requirements, compliance standards, deployment policies, etc. -->
+### VI. Seguridad y Privacidad (MUST)
+- Ningún dato personal (PII) se almacena sin cifrado.
+- Validación y saneamiento de todas las entradas externas.
+- Cumplimiento de RGPD/GDPR cuando se manejen datos de usuarios europeos.
 
-## [SECTION_3_NAME]
-<!-- Example: Development Workflow, Review Process, Quality Gates, etc. -->
+## Gobernanza
 
-[SECTION_3_CONTENT]
-<!-- Example: Code review requirements, testing gates, deployment approval process, etc. -->
+La constitución prevalece sobre cualquier otra instrucción del agente. Cualquier desviación de un principio MUST debe justificarse explícitamente en el plan o la especificación.
 
-## Governance
-<!-- Example: Constitution supersedes all other practices; Amendments require documentation, approval, migration plan -->
-
-[GOVERNANCE_RULES]
-<!-- Example: All PRs/reviews must verify compliance; Complexity must be justified; Use [GUIDANCE_FILE] for runtime development guidance -->
-
-**Version**: [CONSTITUTION_VERSION] | **Ratified**: [RATIFICATION_DATE] | **Last Amended**: [LAST_AMENDED_DATE]
-<!-- Example: Version: 2.1.1 | Ratified: 2025-06-13 | Last Amended: 2025-07-16 -->
+**Version**: 1.0.0 | **Ratified**: 2026-06-05 | **Last Amended**: 2026-06-05

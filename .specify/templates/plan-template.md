@@ -40,7 +40,11 @@
 
 *GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
 
-[Gates determined based on constitution file]
+- [ ] Code Quality: Linter/formatter passed? No credentials?
+- [ ] Testing: 80% coverage minimum? TDD approach planned?
+- [ ] Architecture: Library-first module structure?
+- [ ] UX/Performance/Security: TLS, PCI/GDPR requirements considered?
+
 
 ## Project Structure
 
