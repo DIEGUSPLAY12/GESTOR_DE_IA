@@ -1,1 +1,0 @@
-# GESTOR_DE_IA
