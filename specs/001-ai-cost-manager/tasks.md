@@ -14,7 +14,7 @@ description: "Task list template for feature implementation"
 
 **Purpose**: Project initialization, monorepo scaffold, and detailed documentation structure per user story.
 
-- [ ] T001 Initialize monorepo workspace for `apps/backend`, `apps/frontend`, and `packages/imputation-engine`
+- [X] T001 Initialize monorepo workspace for `apps/backend`, `apps/frontend`, and `packages/imputation-engine`
 - [ ] T002 Develop sub-documentation folders for US: `specs/001-ai-cost-manager/US1_MasterData/` with its own `spec.md`, `plan.md`, `tasks.md`
 - [ ] T003 [P] Develop sub-documentation folders for US: `specs/001-ai-cost-manager/US2_ImputationEngine/` with its own `spec.md`, `plan.md`, `tasks.md`
 - [ ] T004 [P] Develop sub-documentation folders for US: `specs/001-ai-cost-manager/US3_Budgets/` and `US4_Consultants/` identically

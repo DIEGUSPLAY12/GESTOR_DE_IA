@@ -1,0 +1,20 @@
+{
+  "name": "gestor-de-ia",
+  "version": "0.0.1",
+  "private": true,
+  "description": "AI Cost Manager monorepo — Alten",
+  "engines": {
+    "node": ">=20.0.0",
+    "pnpm": ">=9.0.0"
+  },
+  "scripts": {
+    "build": "pnpm -r build",
+    "test": "pnpm -r test",
+    "lint": "pnpm -r lint",
+    "typecheck": "pnpm -r typecheck",
+    "dev": "pnpm --parallel -r dev"
+  },
+  "devDependencies": {
+    "typescript": "^5.5.0"
+  }
+}
