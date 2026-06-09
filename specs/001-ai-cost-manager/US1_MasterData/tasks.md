@@ -8,12 +8,12 @@
 
 ## Phase A: Database Migrations
 
-- [ ] A001 [US1] Escribir migración `0001_master_schema.sql` para Person, Project, AiProvider, PricingPlan con índices y RLS básico en `apps/backend/supabase/migrations/0001_master_schema.sql`
+- [X] A001 [US1] Escribir migración `0001_master_schema.sql` para Person, Project, AiProvider, PricingPlan con índices y RLS básico en `apps/backend/supabase/migrations/0001_master_schema.sql`
   - Tables: `person`, `project`, `ai_provider`, `pricing_plan`
   - All tables include `deleted_at TIMESTAMPTZ` for soft delete
   - All monetary columns: `DECIMAL(19,4)`
 
-- [ ] A002 [US1] Escribir migración `0002_assignment_schema.sql` para AiAccount, AccountOwnership, ProjectAssignment en `apps/backend/supabase/migrations/0002_assignment_schema.sql`
+- [X] A002 [US1] Escribir migración `0002_assignment_schema.sql` para AiAccount, AccountOwnership, ProjectAssignment en `apps/backend/supabase/migrations/0002_assignment_schema.sql`
   - Tables: `ai_account`, `account_ownership`, `project_assignment`
   - `percentage` columns: `DECIMAL(5,2)`, CHECK `0 < percentage <= 100`
   - Foreign key constraints with appropriate `ON DELETE RESTRICT`

@@ -19,26 +19,26 @@ description: "Task list template for feature implementation"
 - [X] T003 [P] Develop sub-documentation folders for US: `specs/001-ai-cost-manager/US2_ImputationEngine/` with its own `spec.md`, `plan.md`, `tasks.md`
 - [X] T004 [P] Develop sub-documentation folders for US: `specs/001-ai-cost-manager/US3_Budgets/` and `US4_Consultants/` identically
 - [X] T005 Configurar TypeScript, ESLint y Prettier en el entorno respetando las reglas de la Constitución de Calidad en la raíz del monorepo
-- [ ] T006 Inicializar API Node.js con Supabase SDK local en `apps/backend` y sistema de colas en segundo plano
-- [ ] T007 [P] Inicializar SPA estática con React, Vite y Tailwind/accessible-components en `apps/frontend`
+- [X] T006 Inicializar API Node.js con Supabase SDK local en `apps/backend` y sistema de colas en segundo plano
+- [X] T007 [P] Inicializar SPA estática con React, Vite y Tailwind/accessible-components en `apps/frontend`
 
 ## Phase 2: Foundational (Data Model & Migrations)
 
 **Purpose**: Base de esquema relacional obligatorio antes de empezar las lógicas de negocio.
 
-- [ ] T008 [US1] Escribir script de migración para las tablas maestras (Person, Project, AiProvider, PricingPlan) en `apps/backend/supabase/migrations/0001_master_schema.sql`
-- [ ] T009 [US1] Escribir script de migración para asignación (AiAccount, AccountOwnership, ProjectAssignment) con fechas en `apps/backend/supabase/migrations/0002_assignment_schema.sql`
-- [ ] T010 [US2] Escribir script de migración con precisión DECIMAL(19,4) para registro inmutable (ImputationResult) y Consumos (TokenConsumption) en `apps/backend/supabase/migrations/0003_imputations_schema.sql`
+- [X] T008 [US1] Escribir script de migración para las tablas maestras (Person, Project, AiProvider, PricingPlan) en `apps/backend/supabase/migrations/0001_master_schema.sql`
+- [X] T009 [US1] Escribir script de migración para asignación (AiAccount, AccountOwnership, ProjectAssignment) con fechas en `apps/backend/supabase/migrations/0002_assignment_schema.sql`
+- [X] T010 [US2] Escribir script de migración con precisión DECIMAL(19,4) para registro inmutable (ImputationResult) y Consumos (TokenConsumption) en `apps/backend/supabase/migrations/0003_imputations_schema.sql`
 
 ## Phase 3: User Story 2 - Ejecución del Motor de Imputaciones (Priority: P2) 🏎️ CORE
 
 **Goal**: Proveer el motor TDD "Library-First" y su comunicación, garantizando precisión monetaria total y suma cero en imputaciones.
 
 **-> Capa de Motor de Imputación (TDD)**
-- [ ] T011 [US2] Crear test unitario TDD que valide el prorrateo de días en cuenta activa en `packages/imputation-engine/tests/proration.test.ts`
-- [ ] T012 [US2] Implementar la función de prorrateo temporal usando y validando las fechas efectivas en `packages/imputation-engine/src/proration.ts`
-- [ ] T013 [US2] Crear test unitario TDD para el reparto entre usuarios (ej: cuenta de 200€ entre 4 al 25%) verificando céntimos perdidos en `packages/imputation-engine/tests/split.test.ts`
-- [ ] T014 [US2] Implementar la lógica del split compartido vía `decimal.js` en `packages/imputation-engine/src/split.ts`
+- [X] T011 [US2] Crear test unitario TDD que valide el prorrateo de días en cuenta activa en `packages/imputation-engine/tests/proration.test.ts`
+- [X] T012 [US2] Implementar la función de prorrateo temporal usando y validando las fechas efectivas en `packages/imputation-engine/src/proration.ts`
+- [X] T013 [US2] Crear test unitario TDD para el reparto entre usuarios (ej: cuenta de 200€ entre 4 al 25%) verificando céntimos perdidos en `packages/imputation-engine/tests/split.test.ts`
+- [X] T014 [US2] Implementar la lógica del split compartido vía `decimal.js` en `packages/imputation-engine/src/split.ts`
 - [ ] T015 [US2] Crear test unitario TDD para la regla de bolsa no-imputado vs dedicación >100% en `packages/imputation-engine/tests/assignment.test.ts`
 - [ ] T016 [US2] Implementar la asignación de coste del consultor al proyecto o bolsa en `packages/imputation-engine/src/assignment.ts`
 - [ ] T017 [US2] Ensamblar tests de TDD End-to-End del motor abstracto validando el SC-001 (Suma cero) en `packages/imputation-engine/tests/engine.test.ts`

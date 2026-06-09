@@ -8,7 +8,7 @@
 
 ## Phase A: Database Migration
 
-- [ ] A001 [US2] Escribir migración `0003_imputations_schema.sql` con DECIMAL(19,4) para `token_consumption` e `imputation_result` en `apps/backend/supabase/migrations/0003_imputations_schema.sql`
+- [X] A001 [US2] Escribir migración `0003_imputations_schema.sql` con DECIMAL(19,4) para `token_consumption` e `imputation_result` en `apps/backend/supabase/migrations/0003_imputations_schema.sql`
   - `imputation_result.audit_hash`: `TEXT NOT NULL` — SHA256 del JSON de entrada
   - `imputation_result.project_id`: `UUID NULLABLE` (null = bolsa no-imputado)
   - Index on `(project_id, period_month)` and `(person_id, period_month)`
@@ -17,21 +17,21 @@
 
 ## Phase B: Engine — TDD Layer (tests first, then implementation)
 
-- [ ] B001 [US2] **TEST** Crear `packages/imputation-engine/tests/proration.test.ts`
+- [X] B001 [US2] **TEST** Crear `packages/imputation-engine/tests/proration.test.ts`
   - Case: cuenta activa 15 de 31 días → coste = totalCost × 15/31
   - Case: cuenta activa todo el mes → coste = totalCost × 1.0
   - Case: cuenta sin días activos → coste = Decimal('0')
 
-- [ ] B002 [US2] **IMPL** Implementar función de prorrateo en `packages/imputation-engine/src/proration.ts`
+- [X] B002 [US2] **IMPL** Implementar función de prorrateo en `packages/imputation-engine/src/proration.ts`
   - Signature: `prorateAccount(account: BaseAccountData, period: PeriodInfo): Decimal`
   - Must pass all B001 tests
 
-- [ ] B003 [US2] **TEST** Crear `packages/imputation-engine/tests/split.test.ts`
+- [X] B003 [US2] **TEST** Crear `packages/imputation-engine/tests/split.test.ts`
   - Case: cuenta 200€ entre 4 titulares al 25% cada uno → cada uno recibe 50.0000€
   - Case: distribución con céntimos fraccionarios → suma total exacta (last-penny rule)
   - Case: único titular al 100% → recibe el total exacto
 
-- [ ] B004 [US2] **IMPL** Implementar split entre titulares en `packages/imputation-engine/src/split.ts`
+- [X] B004 [US2] **IMPL** Implementar split entre titulares en `packages/imputation-engine/src/split.ts`
   - Signature: `splitByOwnership(cost: Decimal, ownerships: AccountOwnershipData[]): OwnerShare[]`
   - Uses `decimal.js`; last-penny applied to first owner
   - Must pass all B003 tests
