@@ -36,21 +36,21 @@
   - Uses `decimal.js`; last-penny applied to first owner
   - Must pass all B003 tests
 
-- [ ] B005 [US2] **TEST** Crear `packages/imputation-engine/tests/assignment.test.ts`
+- [X] B005 [US2] **TEST** Crear `packages/imputation-engine/tests/assignment.test.ts`
   - Case: consultor asignado al 60% proyecto A y 40% proyecto B → distribución correcta
   - Case: consultor sin proyecto en todo el periodo → 100% a bolsa (projectId = null)
   - Case: consultor con 15 días en proyecto A, 16 días en proyecto B → prorrateo temporal
 
-- [ ] B006 [US2] **IMPL** Implementar asignación de coste al proyecto o bolsa en `packages/imputation-engine/src/assignment.ts`
+- [X] B006 [US2] **IMPL** Implementar asignación de coste al proyecto o bolsa en `packages/imputation-engine/src/assignment.ts`
   - Signature: `assignToProjects(ownerCost: Decimal, personId: string, assignments: ProjectAssignmentData[], period: PeriodInfo): ImputationRecord[]`
   - Must pass all B005 tests
 
-- [ ] B007 [US2] **TEST** Crear `packages/imputation-engine/tests/engine.test.ts` — E2E validando SC-001
+- [X] B007 [US2] **TEST** Crear `packages/imputation-engine/tests/engine.test.ts` — E2E validando SC-001
   - Case: periodo completo multi-cuenta, multi-titular → Suma Cero exacta
   - Case: bolsa no-imputado correctamente calculada
   - Case: mismo input × 2 → outputs idénticos (determinismo SC-002)
 
-- [ ] B008 [US2] **IMPL** Ensamblar `calculatePeriod()` en `packages/imputation-engine/src/index.ts`
+- [X] B008 [US2] **IMPL** Ensamblar `calculatePeriod()` en `packages/imputation-engine/src/index.ts`
   - Signature: `calculatePeriod(request: ImputationPeriodRequest): ImputationRecord[]`
   - Calls proration → split → assignment in sequence
   - Post-condition: verifies Suma Cero invariant; throws if violated
