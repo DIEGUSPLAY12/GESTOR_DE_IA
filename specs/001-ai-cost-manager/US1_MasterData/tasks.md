@@ -22,7 +22,7 @@
 
 ## Phase B: Backend — Validators & Shared Logic
 
-- [ ] B001 [US1] Implementar `validateOwnershipSum()` y `validateAssignmentSum()` en `apps/backend/src/modules/master-data/validators.ts`
+- [X] B001 [US1] Implementar `validateOwnershipSum()` y `validateAssignmentSum()` en `apps/backend/src/modules/master-data/validators.ts`
   - Query active records (non-deleted, overlapping date range)
   - Return `{ valid: boolean; currentTotal: number; message?: string }`
 
@@ -30,11 +30,11 @@
 
 ## Phase C: Backend — CRUD Services & Endpoints
 
-- [ ] C001 [US1] Crear servicios CRUD y endpoints REST para Person y Project en `apps/backend/src/modules/master-data/people_projects.ts`
+- [X] C001 [US1] Crear servicios CRUD y endpoints REST para Person y Project en `apps/backend/src/modules/master-data/people_projects.ts`
   - `GET /api/v1/people`, `POST`, `PATCH /:id`, `DELETE /:id` (soft)
   - `GET /api/v1/projects`, `POST`, `PATCH /:id`, `DELETE /:id` (soft)
 
-- [ ] C002 [P] [US1] Crear servicios CRUD y endpoints REST para AiProvider, PricingPlan y AiAccount en `apps/backend/src/modules/master-data/accounts.ts`
+- [X] C002 [P] [US1] Crear servicios CRUD y endpoints REST para AiProvider, PricingPlan y AiAccount en `apps/backend/src/modules/master-data/accounts.ts`
   - `GET /api/v1/providers`, `POST /api/v1/providers`
   - `GET /api/v1/accounts`, `POST /api/v1/accounts`
   - `POST /api/v1/accounts/:id/owners` — uses `validateOwnershipSum()`
