@@ -45,9 +45,9 @@ description: "Task list template for feature implementation"
 - [X] T018 [US2] Ensamblar el calculador global `calculatePeriod()` exportado como lib pura en `packages/imputation-engine/src/index.ts`
 
 **-> Capa de Endpoints API**
-- [ ] T019 [US2] Crear el servicio de consumo de DB que inyecta datos al motor en `apps/backend/src/modules/imputation/service.ts`
-- [ ] T020 [US2] Crear el REST Endpoint `POST /api/v1/imputations/calculate` y encolar el job background en `apps/backend/src/modules/imputation/api.ts`
-- [ ] T021 [US2] Crear Endpoint para validación manual de importaciones de consumos extra (`POST /api/v1/consumptions/import`) en `apps/backend/src/modules/imputation/api_consumptions.ts`
+- [X] T019 [US2] Crear el servicio de consumo de DB que inyecta datos al motor en `apps/backend/src/modules/imputation/service.ts`
+- [X] T020 [US2] Crear el REST Endpoint `POST /api/v1/imputations/calculate` y encolar el job background en `apps/backend/src/modules/imputation/api.ts`
+- [X] T021 [US2] Crear Endpoint para validación manual de importaciones de consumos extra (`POST /api/v1/consumptions/import`) en `apps/backend/src/modules/imputation/api_consumptions.ts`
 
 ## Phase 4: User Story 1 - Gestión de Datos Maestros y Asignaciones (Priority: P1)
 

@@ -1,13 +1,25 @@
 import type { Job } from 'bullmq'
+import { runImputationForPeriod } from './service.js'
 
 export interface ImputationJobData {
-  periodMonth: string // 'YYYY-MM'
-  requestedBy: string // person sub from JWT
+  periodMonth: string
+  requestedBy: string
+  exchangeRates?: Record<string, number>
+  targetCurrency?: string
 }
 
 export default async function runImputationJob(job: Job<ImputationJobData>): Promise<void> {
-  const { periodMonth } = job.data
+  const { periodMonth, exchangeRates, targetCurrency } = job.data
   console.log(`[imputation-worker] Starting calculation for period ${periodMonth}`)
-  // Full implementation in T019 (service.ts)
-  throw new Error(`ImputationService not yet implemented for period ${periodMonth}`)
+
+  const result = await runImputationForPeriod({
+    periodMonth,
+    ...(exchangeRates ? { exchangeRates } : {}),
+    ...(targetCurrency ? { targetCurrency } : {}),
+  })
+
+  console.log(
+    `[imputation-worker] Completed period ${result.periodMonth}: ` +
+      `${result.recordsInserted} records, hash=${result.auditHash.slice(0, 8)}...`,
+  )
 }

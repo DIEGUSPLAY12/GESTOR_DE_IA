@@ -1,5 +1,7 @@
 import express from 'express'
 import { createWorker, QUEUE_NAMES } from './lib/queue.js'
+import { imputationsRouter } from './modules/imputation/api.js'
+import { consumptionsRouter } from './modules/imputation/api_consumptions.js'
 
 const app = express()
 const PORT = Number(process.env['PORT'] ?? 3000)
@@ -12,13 +14,13 @@ app.get('/health', (_req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() })
 })
 
-// Module routes (registered as they are implemented)
+// Module routes
 // app.use('/api/v1/people', peopleRouter)
 // app.use('/api/v1/projects', projectsRouter)
 // app.use('/api/v1/providers', providersRouter)
 // app.use('/api/v1/accounts', accountsRouter)
-// app.use('/api/v1/imputations', imputationsRouter)
-// app.use('/api/v1/consumptions', consumptionsRouter)
+app.use('/api/v1/imputations', imputationsRouter)
+app.use('/api/v1/consumptions', consumptionsRouter)
 // app.use('/api/v1/budgets', budgetsRouter)
 // app.use('/api/v1/consultants', consultantsRouter)
 // app.use('/api/v1/reports', reportsRouter)

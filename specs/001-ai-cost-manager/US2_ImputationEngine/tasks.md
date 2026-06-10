@@ -59,18 +59,18 @@
 
 ## Phase C: Backend API Layer
 
-- [ ] C001 [US2] Implementar `apps/backend/src/modules/imputation/service.ts`
+- [X] C001 [US2] Implementar `apps/backend/src/modules/imputation/service.ts`
   - Queries Supabase for period accounts, ownerships, assignments, consumptions
   - Maps DB rows to `ImputationPeriodRequest`
   - Calls `calculatePeriod()` from engine
   - Persists `ImputationResult` rows with `audit_hash = SHA256(JSON(request))`
 
-- [ ] C002 [P] [US2] Crear `apps/backend/src/modules/imputation/api.ts`
+- [X] C002 [P] [US2] Crear `apps/backend/src/modules/imputation/api.ts`
   - `POST /api/v1/imputations/calculate` — Auth: Admin only
   - Body: `{ period_month: "YYYY-MM" }`
   - Enqueues BullMQ job → returns `202 Accepted`
 
-- [ ] C003 [P] [US2] Crear `apps/backend/src/modules/imputation/api_consumptions.ts`
+- [X] C003 [P] [US2] Crear `apps/backend/src/modules/imputation/api_consumptions.ts`
   - `POST /api/v1/consumptions/import` — multipart CSV upload
   - Parses CSV, persists `TokenConsumption` rows
   - Returns `{ imported: N, skipped: M }`

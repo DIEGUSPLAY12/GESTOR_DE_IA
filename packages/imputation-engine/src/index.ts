@@ -10,7 +10,17 @@ import type {
   PeriodInfo,
 } from './types.js'
 
-export type { ImputationRecord } from './types.js'
+// Public types re-exported for consumers (e.g. backend service)
+export type {
+  ImputationPeriodRequest,
+  ImputationRecord,
+  BaseAccountData,
+  ConsumptionData,
+  AccountOwnershipData,
+  ProjectAssignmentData,
+  PeriodInfo,
+  PlanType,
+} from './types.js'
 export type { ProjectAllocation } from './assignment.js'
 export type { OwnerShare } from './split.js'
 
