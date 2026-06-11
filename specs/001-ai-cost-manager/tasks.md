@@ -88,7 +88,7 @@ description: "Task list template for feature implementation"
   - Añadir hook `useAccountOwners(accountId)` ya existe en `hooks.ts`
 
 **-> Motor de Imputación — Disparador UI**
-- [ ] T039 [US2] Crear panel de cálculo de imputaciones en `apps/frontend/src/features/imputation/components/ImputationPanel.tsx`
+- [X] T039 [US2] Crear panel de cálculo de imputaciones en `apps/frontend/src/features/imputation/components/ImputationPanel.tsx`
   - Selector de periodo (`YYYY-MM`) + botón "Calcular imputaciones"
   - Llama a `POST /api/v1/imputations/calculate` con `{ period_month }`
   - Muestra estado del job: encolado → procesando → completado/error (polling con TanStack Query o SSE)
@@ -96,7 +96,7 @@ description: "Task list template for feature implementation"
   - Disponible en la sección "Informes" o como acción en el Dashboard de presupuestos
 
 **-> Importación CSV de Consumos (PAY_PER_TOKEN)**
-- [ ] T040 [P] [US2] Crear formulario de importación CSV en `apps/frontend/src/features/imputation/components/ConsumptionImport.tsx`
+- [X] T040 [P] [US2] Crear formulario de importación CSV en `apps/frontend/src/features/imputation/components/ConsumptionImport.tsx`
   - Input `<input type="file" accept=".csv">` con drag-and-drop opcional
   - Submit hace `multipart/form-data POST /api/v1/consumptions/import`
   - Muestra resultado: `{ imported: N, skipped: M }` con detalle de filas omitidas

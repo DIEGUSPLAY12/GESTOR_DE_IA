@@ -81,14 +81,14 @@
 
 ## Phase D: Frontend — Disparador de Cálculo e Importación CSV
 
-- [ ] D001 [US2] Crear panel de cálculo de imputaciones en `apps/frontend/src/features/imputation/components/ImputationPanel.tsx`
+- [X] D001 [US2] Crear panel de cálculo de imputaciones en `apps/frontend/src/features/imputation/components/ImputationPanel.tsx`
   - Selector de periodo `YYYY-MM` + botón "Calcular imputaciones"
   - Llama a `POST /api/v1/imputations/calculate` con `{ period_month }`
   - Muestra estado del job BullMQ: encolado → completado / error
   - Al completar con éxito, invalida la query `['budgets', periodMonth]` para refrescar el dashboard
   - Auth: solo visible para rol ADMIN
 
-- [ ] D002 [P] [US2] Crear formulario de importación CSV en `apps/frontend/src/features/imputation/components/ConsumptionImport.tsx`
+- [X] D002 [P] [US2] Crear formulario de importación CSV en `apps/frontend/src/features/imputation/components/ConsumptionImport.tsx`
   - `<input type="file" accept=".csv">` para cuentas de tipo PAY_PER_TOKEN
   - Submit con `multipart/form-data` a `POST /api/v1/consumptions/import`
   - Muestra resultado: `{ imported: N, skipped: M }` con indicación de filas ignoradas
