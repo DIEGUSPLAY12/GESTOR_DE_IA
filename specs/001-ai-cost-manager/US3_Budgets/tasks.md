@@ -8,7 +8,7 @@
 
 ## Phase A: Backend — Budget API
 
-- [ ] A001 [US3] Crear `apps/backend/src/modules/budgets/api.ts`
+- [X] A001 [US3] Crear `apps/backend/src/modules/budgets/api.ts`
   - `GET /api/v1/budgets?period_month=YYYY-MM` — filtra por `project_manager_id` del JWT
   - Returns `BudgetSummary[]`: `{ project_id, project_name, monthly_budget, actual_cost, percentage_used, status }`
   - `status` = `'OK' | 'WARNING' | 'DANGER'` (thresholds: <70%, 70–89%, ≥90%)
@@ -18,17 +18,17 @@
 
 ## Phase B: Frontend — Dashboard Components
 
-- [ ] B001 [P] [US3] Implementar hook `useBudgets(periodMonth)` en `apps/frontend/src/features/budgets/api/hooks.ts`
+- [X] B001 [P] [US3] Implementar hook `useBudgets(periodMonth)` en `apps/frontend/src/features/budgets/api/hooks.ts`
   - TanStack Query: `queryKey: ['budgets', periodMonth]`
   - Invalidated when imputation calculation completes (via mutation side-effect)
 
-- [ ] B002 [US3] Crear `apps/frontend/src/features/budgets/components/BudgetDashboard.tsx`
+- [X] B002 [US3] Crear `apps/frontend/src/features/budgets/components/BudgetDashboard.tsx`
   - Recharts `BarChart`: presupuesto vs coste real por proyecto
   - Eje X: nombre de proyecto; Eje Y: importe en EUR
   - Tooltip con porcentaje consumido
   - WCAG 2.1 AA: `aria-label` en el chart, alternativa en tabla accesible
 
-- [ ] B003 [P] [US3] Crear `apps/frontend/src/features/budgets/components/DeviationsAlert.tsx`
+- [X] B003 [P] [US3] Crear `apps/frontend/src/features/budgets/components/DeviationsAlert.tsx`
   - Tarjeta por proyecto con indicador de estado (verde/amarillo/rojo)
   - El estado se transmite por color Y por texto (`aria-live` para actualizaciones dinámicas)
   - Props: `summary: BudgetSummary`

@@ -58,18 +58,18 @@ description: "Task list template for feature implementation"
 - [X] T023 [P] [US1] Crear servicios y Endpoints CRUD para Proveedores, Planes y Cuentas de IA en `apps/backend/src/modules/master-data/accounts.ts`
 
 **-> Capa de Frontend y Cuadros**
-- [ ] T024 [P] [US1] Armar la integración de estado de servidor (TanStack Query hooks) en `apps/frontend/src/features/master-data/api/hooks.ts`
-- [ ] T025 [US1] Crear componente accesible Tabla/Filtro para control de Proyectos en `apps/frontend/src/features/master-data/components/ProjectsTable.tsx`
-- [ ] T026 [P] [US1] Crear formularios de asignación de consultor-proyecto respetando control UX de % máximo en `apps/frontend/src/features/master-data/components/AssignmentForm.tsx`
+- [X] T024 [P] [US1] Armar la integración de estado de servidor (TanStack Query hooks) en `apps/frontend/src/features/master-data/api/hooks.ts`
+- [X] T025 [US1] Crear componente accesible Tabla/Filtro para control de Proyectos en `apps/frontend/src/features/master-data/components/ProjectsTable.tsx`
+- [X] T026 [P] [US1] Crear formularios de asignación de consultor-proyecto respetando control UX de % máximo en `apps/frontend/src/features/master-data/components/AssignmentForm.tsx`
 
 ## Phase 5: User Story 3 - Control de Presupuestos (Priority: P3)
 
 **Goal**: Dashboards de líderes de proyecto.
 
 **-> Capa de Frontend y Cuadros**
-- [ ] T027 [US3] Crear API Endpoint para consultas de budget en `apps/backend/src/modules/budgets/api.ts`
-- [ ] T028 [US3] Desarrollar Dashboard SPA de presupuestos comparativos vía TanStack Query y Recharts en `apps/frontend/src/features/budgets/components/BudgetDashboard.tsx`
-- [ ] T029 [P] [US3] Implementar tarjeta visual de Alertas de Desviación en el dashboard en `apps/frontend/src/features/budgets/components/DeviationsAlert.tsx`
+- [X] T027 [US3] Crear API Endpoint para consultas de budget en `apps/backend/src/modules/budgets/api.ts`
+- [X] T028 [US3] Desarrollar Dashboard SPA de presupuestos comparativos vía TanStack Query y Recharts en `apps/frontend/src/features/budgets/components/BudgetDashboard.tsx`
+- [X] T029 [P] [US3] Implementar tarjeta visual de Alertas de Desviación en el dashboard en `apps/frontend/src/features/budgets/components/DeviationsAlert.tsx`
 
 ## Phase 6: User Story 4 - Consulta Individual (Priority: P4)
 

@@ -48,7 +48,7 @@
 
 ## Phase D: Frontend — API Hooks
 
-- [ ] D001 [P] [US1] Implementar TanStack Query hooks para todas las entidades maestras en `apps/frontend/src/features/master-data/api/hooks.ts`
+- [X] D001 [P] [US1] Implementar TanStack Query hooks para todas las entidades maestras en `apps/frontend/src/features/master-data/api/hooks.ts`
   - `usePersons()`, `useCreatePerson()`, `useUpdatePerson()`, `useDeletePerson()`
   - `useProjects()`, `useCreateProject()`, `useUpdateProject()`, `useDeleteProject()`
   - `useProviders()`, `useAccounts()`, `useCreateAccount()`
@@ -59,13 +59,13 @@
 
 ## Phase E: Frontend — UI Components
 
-- [ ] E001 [US1] Crear componente `ProjectsTable` accesible en `apps/frontend/src/features/master-data/components/ProjectsTable.tsx`
+- [X] E001 [US1] Crear componente `ProjectsTable` accesible en `apps/frontend/src/features/master-data/components/ProjectsTable.tsx`
   - Columns: code, name, client, PM, budget, status (active/inactive)
   - Column sort, filter by status (active/inactive)
   - WCAG 2.1 AA: `role="table"`, `aria-sort`, keyboard navigation
   - Action buttons: Edit, Soft-delete
 
-- [ ] E002 [P] [US1] Crear formulario `AssignmentForm` en `apps/frontend/src/features/master-data/components/AssignmentForm.tsx`
+- [X] E002 [P] [US1] Crear formulario `AssignmentForm` en `apps/frontend/src/features/master-data/components/AssignmentForm.tsx`
   - Fields: person, project, percentage, valid_from, valid_to (optional)
   - Client-side guard: warn if new % would exceed 100% (based on cached current total)
   - Server error from `422` surfaced inline below the percentage field
