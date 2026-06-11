@@ -72,11 +72,46 @@
 
 ---
 
+---
+
+## Phase F: Frontend — Proveedores y Cuentas de IA
+
+- [X] F001 [US1] Crear panel de gestión de Proveedores y Planes en `apps/frontend/src/features/master-data/components/ProvidersPanel.tsx`
+  - Tabla de proveedores con Añadir / soft-delete
+  - Al expandir fila, muestra planes del proveedor (nombre, tipo, precio, vigencia)
+  - Formulario inline para crear proveedor (`POST /api/v1/providers`) y plan (`POST /api/v1/providers/:id/plans`)
+  - Hooks disponibles: `useProviders()` — añadir `useCreateProvider()`, `usePlans(providerId)`, `useCreatePlan()`
+
+- [X] F002 [US1] Crear panel de gestión de Cuentas de IA en `apps/frontend/src/features/master-data/components/AccountsPanel.tsx`
+  - Tabla con: identificador externo, plan asociado, proveedor, valid_from/to, estado activo/inactivo
+  - Formulario de alta: selector de plan de pricing, identificador externo, fechas
+  - Soft-delete con confirmación
+  - Hooks disponibles: `useAccounts()`, `useCreateAccount()`
+
+---
+
+## Phase G: Frontend — Titularidad de Cuentas
+
+- [ ] G001 [P] [US1] Crear formulario `OwnershipForm` en `apps/frontend/src/features/master-data/components/OwnershipForm.tsx`
+  - Lista de titulares actuales de una cuenta (nombre, %, vigencia)
+  - Formulario para añadir titular: selector de persona, porcentaje (guardia ≤ 100% idéntica a AssignmentForm), valid_from/to
+  - Error 422 del servidor mostrado inline bajo el campo de porcentaje
+  - Hooks disponibles: `useAccountOwners(accountId)`, `useAssignOwner()`
+
+- [X] G002 [US1] Añadir hooks faltantes en `apps/frontend/src/features/master-data/api/hooks.ts`
+  - `useCreateProvider()` — `POST /api/v1/providers`
+  - `usePlans(providerId)` — `GET /api/v1/providers/:id/plans`
+  - `useCreatePlan()` — `POST /api/v1/providers/:id/plans`
+  - Invalidación de caché en mutations
+
+---
+
 ## Acceptance Criteria Cross-Check
 
 | Scenario | Tasks covering it |
 |----------|--------------------|
-| SC-US1-01: Añadir titular sin superar 100% | B001, C002, D001 |
+| SC-US1-01: Añadir titular sin superar 100% | B001, C002, D001, G001 |
 | SC-US1-02: Asignar consultor ≤ 100% | B001, C003, E002 |
-| SC-US1-03: Borrado lógico | A001, A002, C001, C002, C003 |
-| FR-011: Filtros en listados | E001 |
+| SC-US1-03: Borrado lógico | A001, A002, C001, C002, C003, F002 |
+| FR-011: Filtros en listados | E001, F001, F002 |
+| FR-001: CRUD completo de todas las entidades | C001, C002, F001, F002, G001 |

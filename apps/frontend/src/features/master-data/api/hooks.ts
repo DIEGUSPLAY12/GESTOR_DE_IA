@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { api } from '../../../lib/api.js'
+import { DEMO_PROJECTS, DEMO_PEOPLE, DEMO_PROVIDERS, DEMO_PLANS, DEMO_ACCOUNTS } from '../../../lib/demo-data.js'
 import type {
   AiAccount,
   AiProvider,
@@ -8,8 +9,11 @@ import type {
   AssignProjectInput,
   CreateAccountInput,
   CreatePersonInput,
+  CreatePlanInput,
   CreateProjectInput,
+  CreateProviderInput,
   Person,
+  PricingPlan,
   Project,
   ProjectAssignment,
   UpdatePersonInput,
@@ -22,6 +26,7 @@ export const KEYS = {
   people: ['people'] as const,
   projects: ['projects'] as const,
   providers: ['providers'] as const,
+  plans: (providerId: string) => ['providers', providerId, 'plans'] as const,
   accounts: ['accounts'] as const,
   accountOwners: (accountId: string) => ['accounts', accountId, 'owners'] as const,
   personAssignments: (personId: string) => ['people', personId, 'assignments'] as const,
@@ -32,7 +37,13 @@ export const KEYS = {
 export function usePersons() {
   return useQuery({
     queryKey: KEYS.people,
-    queryFn: () => api.get<{ data: Person[] }>('/people').then((r) => r.data),
+    queryFn: async () => {
+      try {
+        return await api.get<{ data: Person[] }>('/people').then((r) => r.data)
+      } catch {
+        return DEMO_PEOPLE
+      }
+    },
   })
 }
 
@@ -67,7 +78,13 @@ export function useDeletePerson() {
 export function useProjects() {
   return useQuery({
     queryKey: KEYS.projects,
-    queryFn: () => api.get<{ data: Project[] }>('/projects').then((r) => r.data),
+    queryFn: async () => {
+      try {
+        return await api.get<{ data: Project[] }>('/projects').then((r) => r.data)
+      } catch {
+        return DEMO_PROJECTS
+      }
+    },
   })
 }
 
@@ -102,7 +119,59 @@ export function useDeleteProject() {
 export function useProviders() {
   return useQuery({
     queryKey: KEYS.providers,
-    queryFn: () => api.get<{ data: AiProvider[] }>('/providers').then((r) => r.data),
+    queryFn: async () => {
+      try {
+        return await api.get<{ data: AiProvider[] }>('/providers').then((r) => r.data)
+      } catch {
+        return DEMO_PROVIDERS
+      }
+    },
+  })
+}
+
+export function useCreateProvider() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: (input: CreateProviderInput) =>
+      api.post<{ data: AiProvider }>('/providers', input).then((r) => r.data),
+    onSuccess: () => { qc.invalidateQueries({ queryKey: KEYS.providers }) },
+  })
+}
+
+export function useDeleteProvider() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: (id: string) => api.delete<{ message: string }>(`/providers/${id}`),
+    onSuccess: () => { qc.invalidateQueries({ queryKey: KEYS.providers }) },
+  })
+}
+
+export function usePlans(providerId: string) {
+  return useQuery({
+    queryKey: KEYS.plans(providerId),
+    queryFn: async () => {
+      try {
+        return await api
+          .get<{ data: PricingPlan[] }>(`/providers/${providerId}/plans`)
+          .then((r) => r.data)
+      } catch {
+        return DEMO_PLANS.filter((p) => p.provider_id === providerId)
+      }
+    },
+    enabled: Boolean(providerId),
+  })
+}
+
+export function useCreatePlan() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: ({ providerId, ...input }: CreatePlanInput & { providerId: string }) =>
+      api
+        .post<{ data: PricingPlan }>(`/providers/${providerId}/plans`, input)
+        .then((r) => r.data),
+    onSuccess: (_data, vars) => {
+      qc.invalidateQueries({ queryKey: KEYS.plans(vars.providerId) })
+    },
   })
 }
 
@@ -111,7 +180,13 @@ export function useProviders() {
 export function useAccounts() {
   return useQuery({
     queryKey: KEYS.accounts,
-    queryFn: () => api.get<{ data: AiAccount[] }>('/accounts').then((r) => r.data),
+    queryFn: async () => {
+      try {
+        return await api.get<{ data: AiAccount[] }>('/accounts').then((r) => r.data)
+      } catch {
+        return DEMO_ACCOUNTS
+      }
+    },
   })
 }
 
@@ -120,6 +195,14 @@ export function useCreateAccount() {
   return useMutation({
     mutationFn: (input: CreateAccountInput) =>
       api.post<{ data: AiAccount }>('/accounts', input).then((r) => r.data),
+    onSuccess: () => { qc.invalidateQueries({ queryKey: KEYS.accounts }) },
+  })
+}
+
+export function useDeleteAccount() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: (id: string) => api.delete<{ message: string }>(`/accounts/${id}`),
     onSuccess: () => { qc.invalidateQueries({ queryKey: KEYS.accounts }) },
   })
 }

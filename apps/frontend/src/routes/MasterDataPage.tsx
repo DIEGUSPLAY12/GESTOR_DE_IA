@@ -1,9 +1,18 @@
 import { useState } from 'react'
 import { ProjectsTable } from '../features/master-data/components/ProjectsTable.js'
 import { AssignmentForm } from '../features/master-data/components/AssignmentForm.js'
+import { ProvidersPanel } from '../features/master-data/components/ProvidersPanel.js'
+import { AccountsPanel } from '../features/master-data/components/AccountsPanel.js'
 import type { Project } from '../features/master-data/types.js'
 
-type Tab = 'projects' | 'assignments'
+type Tab = 'projects' | 'assignments' | 'providers' | 'accounts'
+
+const TABS: { id: Tab; label: string }[] = [
+  { id: 'projects', label: 'Proyectos' },
+  { id: 'assignments', label: 'Asignaciones' },
+  { id: 'providers', label: 'Proveedores' },
+  { id: 'accounts', label: 'Cuentas IA' },
+]
 
 export default function MasterDataPage() {
   const [activeTab, setActiveTab] = useState<Tab>('projects')
@@ -21,26 +30,19 @@ export default function MasterDataPage() {
       <h1 className="text-2xl font-bold mb-6">Datos Maestros</h1>
 
       <div role="tablist" aria-label="Secciones de datos maestros" className="flex gap-1 border-b border-gray-200 mb-6">
-        <button
-          role="tab"
-          aria-selected={activeTab === 'projects'}
-          aria-controls="tab-panel-projects"
-          id="tab-projects"
-          className={tabClass('projects')}
-          onClick={() => setActiveTab('projects')}
-        >
-          Proyectos
-        </button>
-        <button
-          role="tab"
-          aria-selected={activeTab === 'assignments'}
-          aria-controls="tab-panel-assignments"
-          id="tab-assignments"
-          className={tabClass('assignments')}
-          onClick={() => setActiveTab('assignments')}
-        >
-          Asignaciones
-        </button>
+        {TABS.map(({ id, label }) => (
+          <button
+            key={id}
+            role="tab"
+            aria-selected={activeTab === id}
+            aria-controls={`tab-panel-${id}`}
+            id={`tab-${id}`}
+            className={tabClass(id)}
+            onClick={() => setActiveTab(id)}
+          >
+            {label}
+          </button>
+        ))}
       </div>
 
       <div
@@ -75,6 +77,24 @@ export default function MasterDataPage() {
         <div className="max-w-lg">
           <AssignmentForm onSuccess={() => setActiveTab('projects')} />
         </div>
+      </div>
+
+      <div
+        role="tabpanel"
+        id="tab-panel-providers"
+        aria-labelledby="tab-providers"
+        hidden={activeTab !== 'providers'}
+      >
+        <ProvidersPanel />
+      </div>
+
+      <div
+        role="tabpanel"
+        id="tab-panel-accounts"
+        aria-labelledby="tab-accounts"
+        hidden={activeTab !== 'accounts'}
+      >
+        <AccountsPanel />
       </div>
     </div>
   )

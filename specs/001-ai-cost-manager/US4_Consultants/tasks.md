@@ -8,7 +8,7 @@
 
 ## Phase A: Backend — Consultant API
 
-- [ ] A001 [US4] Crear `apps/backend/src/modules/consultants/api.ts`
+- [X] A001 [US4] Crear `apps/backend/src/modules/consultants/api.ts`
   - `GET /api/v1/consultants/me/costs?period_month=YYYY-MM`
   - Auth: any authenticated user (Consultant, PM, Admin)
   - `current_person_id` resolved from JWT middleware — never from query param
@@ -19,10 +19,10 @@
 
 ## Phase B: Frontend — Consultant Dashboard
 
-- [ ] B001 [P] [US4] Implementar hook `useMyConsultantCosts(periodMonth)` en `apps/frontend/src/features/consultants/api/hooks.ts`
+- [X] B001 [P] [US4] Implementar hook `useMyConsultantCosts(periodMonth)` en `apps/frontend/src/features/consultants/api/hooks.ts`
   - TanStack Query: `queryKey: ['consultant-costs', periodMonth]`
 
-- [ ] B002 [US4] Crear `apps/frontend/src/features/consultants/components/ConsultantDashboard.tsx`
+- [X] B002 [US4] Crear `apps/frontend/src/features/consultants/components/ConsultantDashboard.tsx`
   - Tabla de sólo lectura: columnas Account, Provider, Period, Cost (EUR), Ownership %
   - Estado vacío con mensaje informativo si no hay cuentas asignadas
   - Sin botones de edición ni acción (rol Consultor = read-only)

@@ -124,3 +124,20 @@ export interface AssignProjectInput {
   valid_from: string
   valid_to?: string
 }
+
+export interface CreateProviderInput {
+  name: string
+}
+
+export interface CreatePlanInput {
+  type: PlanType
+  name: string
+  unit_price?: number
+  currency?: string
+  effective_from: string
+  effective_to?: string
+}
+
+export interface DeleteAccountInput {
+  id: string
+}

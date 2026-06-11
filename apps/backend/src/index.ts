@@ -5,6 +5,8 @@ import { consumptionsRouter } from './modules/imputation/api_consumptions.js'
 import { peopleRouter, projectsRouter } from './modules/master-data/people_projects.js'
 import { providersRouter, accountsRouter } from './modules/master-data/accounts.js'
 import { budgetsRouter } from './modules/budgets/api.js'
+import { consultantsRouter } from './modules/consultants/api.js'
+import { reportsRouter } from './modules/reports/api.js'
 
 const app = express()
 const PORT = Number(process.env['PORT'] ?? 3000)
@@ -25,9 +27,8 @@ app.use('/api/v1/accounts', accountsRouter)
 app.use('/api/v1/budgets', budgetsRouter)
 app.use('/api/v1/imputations', imputationsRouter)
 app.use('/api/v1/consumptions', consumptionsRouter)
-// app.use('/api/v1/budgets', budgetsRouter)
-// app.use('/api/v1/consultants', consultantsRouter)
-// app.use('/api/v1/reports', reportsRouter)
+app.use('/api/v1/consultants', consultantsRouter)
+app.use('/api/v1/reports', reportsRouter)
 
 // Imputation background worker
 createWorker(QUEUE_NAMES.IMPUTATION, async (job) => {

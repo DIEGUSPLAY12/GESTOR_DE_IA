@@ -1,14 +1,20 @@
 import { useQuery } from '@tanstack/react-query'
 import { api } from '../../../lib/api.js'
+import { DEMO_BUDGETS } from '../../../lib/demo-data.js'
 import type { BudgetSummary } from '../types.js'
 
 export function useBudgets(periodMonth: string) {
   return useQuery({
     queryKey: ['budgets', periodMonth],
-    queryFn: () =>
-      api
-        .get<{ data: BudgetSummary[] }>(`/budgets?period_month=${encodeURIComponent(periodMonth)}`)
-        .then((r) => r.data),
+    queryFn: async () => {
+      try {
+        return await api
+          .get<{ data: BudgetSummary[] }>(`/budgets?period_month=${encodeURIComponent(periodMonth)}`)
+          .then((r) => r.data)
+      } catch {
+        return DEMO_BUDGETS
+      }
+    },
     enabled: Boolean(periodMonth),
   })
 }

@@ -62,6 +62,46 @@ description: "Task list template for feature implementation"
 - [X] T025 [US1] Crear componente accesible Tabla/Filtro para control de Proyectos en `apps/frontend/src/features/master-data/components/ProjectsTable.tsx`
 - [X] T026 [P] [US1] Crear formularios de asignación de consultor-proyecto respetando control UX de % máximo en `apps/frontend/src/features/master-data/components/AssignmentForm.tsx`
 
+## Phase 4b: User Story 1 — Frontend Admin (pantallas faltantes)
+
+**Goal**: Completar la interfaz de administración para que el ciclo completo sea operable desde la web sin tocar la API directamente.
+
+**-> Gestión de Proveedores y Planes**
+- [X] T036 [US1] Crear panel de gestión de Proveedores de IA en `apps/frontend/src/features/master-data/components/ProvidersPanel.tsx`
+  - Tabla de proveedores con botón Añadir y soft-delete
+  - Al expandir un proveedor, muestra sus planes de pricing (nombre, tipo, precio/unidad, vigencia)
+  - Formulario inline para crear nuevo proveedor y nuevo plan (`POST /api/v1/providers` y `POST /api/v1/providers/:id/plans`)
+  - Integrar en la pestaña "Datos Maestros" junto a Proyectos
+
+**-> Gestión de Cuentas de IA**
+- [X] T037 [US1] Crear panel de gestión de Cuentas de IA en `apps/frontend/src/features/master-data/components/AccountsPanel.tsx`
+  - Tabla de cuentas con: identificador externo, plan asociado, proveedor, fechas de vigencia, estado
+  - Formulario de alta (`POST /api/v1/accounts`): selector de plan, identificador, valid_from/to
+  - Soft-delete con confirmación
+  - Hooks ya disponibles en `hooks.ts` (`useAccounts`, `useCreateAccount`)
+
+**-> Asignación de Titulares a Cuentas**
+- [ ] T038 [P] [US1] Crear formulario `OwnershipForm` en `apps/frontend/src/features/master-data/components/OwnershipForm.tsx`
+  - Dentro del detalle de una cuenta, lista sus titulares actuales con % y fechas
+  - Formulario para añadir titular: selector de persona, % (con guardia ≤ 100% igual que AssignmentForm), valid_from/to
+  - Usa `useAssignOwner()` y muestra error 422 inline
+  - Añadir hook `useAccountOwners(accountId)` ya existe en `hooks.ts`
+
+**-> Motor de Imputación — Disparador UI**
+- [ ] T039 [US2] Crear panel de cálculo de imputaciones en `apps/frontend/src/features/imputation/components/ImputationPanel.tsx`
+  - Selector de periodo (`YYYY-MM`) + botón "Calcular imputaciones"
+  - Llama a `POST /api/v1/imputations/calculate` con `{ period_month }`
+  - Muestra estado del job: encolado → procesando → completado/error (polling con TanStack Query o SSE)
+  - Al completar, invalida la caché de presupuestos automáticamente
+  - Disponible en la sección "Informes" o como acción en el Dashboard de presupuestos
+
+**-> Importación CSV de Consumos (PAY_PER_TOKEN)**
+- [ ] T040 [P] [US2] Crear formulario de importación CSV en `apps/frontend/src/features/imputation/components/ConsumptionImport.tsx`
+  - Input `<input type="file" accept=".csv">` con drag-and-drop opcional
+  - Submit hace `multipart/form-data POST /api/v1/consumptions/import`
+  - Muestra resultado: `{ imported: N, skipped: M }` con detalle de filas omitidas
+  - Situar junto al disparador de cálculo (T039)
+
 ## Phase 5: User Story 3 - Control de Presupuestos (Priority: P3)
 
 **Goal**: Dashboards de líderes de proyecto.
@@ -75,14 +115,14 @@ description: "Task list template for feature implementation"
 
 **Goal**: Visibilidad para consultores individuales sobre su huella.
 
-- [ ] T030 [US4] Endpoint seguro de acceso a datos individuales del JWT Entra ID logueado en `apps/backend/src/modules/consultants/api.ts`
-- [ ] T031 [P] [US4] Implementar el layout de consumo para los consultores (`ConsultantDashboard.tsx`) en `apps/frontend/src/features/consultants/components/ConsultantDashboard.tsx`
+- [X] T030 [US4] Endpoint seguro de acceso a datos individuales del JWT Entra ID logueado en `apps/backend/src/modules/consultants/api.ts`
+- [X] T031 [P] [US4] Implementar el layout de consumo para los consultores (`ConsultantDashboard.tsx`) en `apps/frontend/src/features/consultants/components/ConsultantDashboard.tsx`
 
 ## Phase 7: Informes y Exportaciones (Cross-Cutting Polish)
 
 **Goal**: Trazabilidad hacia finanzas y auditoría.
 
-- [ ] T032 Generar el exportador a formato CSV (según Research) de los `ImputationResults` auditados en `apps/backend/src/modules/reports/service.ts`
-- [ ] T033 Implementar el Endpoint `GET /api/v1/reports/export` filtrado por fecha en `apps/backend/src/modules/reports/api.ts`
-- [ ] T034 [P] Añadir el botón en el Dashboard de Admin para descargar CSVs financieros en `apps/frontend/src/features/reports/components/ExportPanel.tsx`
-- [ ] T035 Levantar tests end-to-end (Playwright) ejecutando flujo: [Alta Master] -> [Asignación] -> [Cálculo] -> [Exportar] en `apps/frontend/tests/e2e/core_flow.spec.ts`
+- [X] T032 Generar el exportador a formato CSV (según Research) de los `ImputationResults` auditados en `apps/backend/src/modules/reports/service.ts`
+- [X] T033 Implementar el Endpoint `GET /api/v1/reports/export` filtrado por fecha en `apps/backend/src/modules/reports/api.ts`
+- [X] T034 [P] Añadir el botón en el Dashboard de Admin para descargar CSVs financieros en `apps/frontend/src/features/reports/components/ExportPanel.tsx`
+- [X] T035 Levantar tests end-to-end (Playwright) ejecutando flujo: [Alta Master] -> [Asignación] -> [Cálculo] -> [Exportar] en `apps/frontend/tests/e2e/core_flow.spec.ts`
