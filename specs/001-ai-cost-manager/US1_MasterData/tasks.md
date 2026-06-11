@@ -92,7 +92,7 @@
 
 ## Phase G: Frontend — Titularidad de Cuentas
 
-- [ ] G001 [P] [US1] Crear formulario `OwnershipForm` en `apps/frontend/src/features/master-data/components/OwnershipForm.tsx`
+- [X] G001 [P] [US1] Crear formulario `OwnershipForm` en `apps/frontend/src/features/master-data/components/OwnershipForm.tsx`
   - Lista de titulares actuales de una cuenta (nombre, %, vigencia)
   - Formulario para añadir titular: selector de persona, porcentaje (guardia ≤ 100% idéntica a AssignmentForm), valid_from/to
   - Error 422 del servidor mostrado inline bajo el campo de porcentaje

@@ -6,6 +6,7 @@ import {
   useProviders,
   usePlans,
 } from '../api/hooks.js'
+import { OwnershipForm } from './OwnershipForm.js'
 import type { AiAccount, CreateAccountInput, PlanType } from '../types.js'
 
 const PLAN_TYPE_BADGE: Record<PlanType, string> = {
@@ -185,51 +186,78 @@ function CreateAccountForm({ onClose }: CreateFormProps) {
   )
 }
 
-// ─── Account row ──────────────────────────────────────────────────────────────
+// ─── Account row (with inline OwnershipForm) ──────────────────────────────────
 
 function AccountRow({ account, onDelete }: { account: AiAccount; onDelete: (id: string) => void }) {
+  const [expanded, setExpanded] = useState(false)
   const plan = account.pricing_plan
+  const rowId = `owners-${account.id}`
+
   return (
-    <tr className="hover:bg-gray-50">
-      <td className="px-4 py-3 text-sm font-mono text-gray-800 max-w-xs truncate" title={account.external_identifier}>
-        {account.external_identifier}
-      </td>
-      <td className="px-4 py-3 text-sm text-gray-600">
-        {plan ? (
-          <div className="flex items-center gap-2">
-            <span className={`px-1.5 py-0.5 rounded text-xs font-medium ${PLAN_TYPE_BADGE[plan.type]}`}>
-              {plan.type}
+    <>
+      <tr className="hover:bg-gray-50">
+        <td className="px-4 py-3 text-sm font-mono text-gray-800 max-w-xs truncate" title={account.external_identifier}>
+          <button
+            type="button"
+            aria-expanded={expanded}
+            aria-controls={rowId}
+            onClick={() => setExpanded((v) => !v)}
+            className="flex items-center gap-1.5 text-left focus:outline-none focus-visible:ring-1 focus-visible:ring-blue-400 rounded"
+          >
+            <span
+              aria-hidden="true"
+              className="text-gray-400 text-xs w-3 inline-block transition-transform"
+              style={{ transform: expanded ? 'rotate(90deg)' : undefined }}
+            >
+              ▶
             </span>
-            <span>{plan.name}</span>
-          </div>
-        ) : (
-          <span className="text-gray-400">—</span>
-        )}
-      </td>
-      <td className="px-4 py-3 text-sm text-gray-600 text-right whitespace-nowrap">
-        {plan?.type === 'PAY_PER_TOKEN' ? (
-          <span className="text-gray-400">variable</span>
-        ) : plan ? (
-          `${Number(plan.unit_price).toFixed(2)} ${plan.currency}`
-        ) : (
-          <span className="text-gray-400">—</span>
-        )}
-      </td>
-      <td className="px-4 py-3 text-sm text-gray-500 whitespace-nowrap">{account.valid_from}</td>
-      <td className="px-4 py-3 text-sm text-gray-500 whitespace-nowrap">
-        {account.valid_to ?? <span className="text-gray-400">vigente</span>}
-      </td>
-      <td className="px-4 py-3 text-right">
-        <button
-          type="button"
-          onClick={() => onDelete(account.id)}
-          className="text-xs text-red-400 hover:text-red-600 focus:outline-none focus-visible:ring-1 focus-visible:ring-red-400 rounded"
-          aria-label={`Eliminar cuenta ${account.external_identifier}`}
-        >
-          Eliminar
-        </button>
-      </td>
-    </tr>
+            {account.external_identifier}
+          </button>
+        </td>
+        <td className="px-4 py-3 text-sm text-gray-600">
+          {plan ? (
+            <div className="flex items-center gap-2">
+              <span className={`px-1.5 py-0.5 rounded text-xs font-medium ${PLAN_TYPE_BADGE[plan.type]}`}>
+                {plan.type}
+              </span>
+              <span>{plan.name}</span>
+            </div>
+          ) : (
+            <span className="text-gray-400">—</span>
+          )}
+        </td>
+        <td className="px-4 py-3 text-sm text-gray-600 text-right whitespace-nowrap">
+          {plan?.type === 'PAY_PER_TOKEN' ? (
+            <span className="text-gray-400">variable</span>
+          ) : plan ? (
+            `${Number(plan.unit_price).toFixed(2)} ${plan.currency}`
+          ) : (
+            <span className="text-gray-400">—</span>
+          )}
+        </td>
+        <td className="px-4 py-3 text-sm text-gray-500 whitespace-nowrap">{account.valid_from}</td>
+        <td className="px-4 py-3 text-sm text-gray-500 whitespace-nowrap">
+          {account.valid_to ?? <span className="text-gray-400">vigente</span>}
+        </td>
+        <td className="px-4 py-3 text-right">
+          <button
+            type="button"
+            onClick={() => onDelete(account.id)}
+            className="text-xs text-red-400 hover:text-red-600 focus:outline-none focus-visible:ring-1 focus-visible:ring-red-400 rounded"
+            aria-label={`Eliminar cuenta ${account.external_identifier}`}
+          >
+            Eliminar
+          </button>
+        </td>
+      </tr>
+      {expanded && (
+        <tr id={rowId}>
+          <td colSpan={6} className="px-4 pb-4 bg-gray-50">
+            <OwnershipForm accountId={account.id} />
+          </td>
+        </tr>
+      )}
+    </>
   )
 }
 

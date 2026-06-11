@@ -81,7 +81,7 @@ description: "Task list template for feature implementation"
   - Hooks ya disponibles en `hooks.ts` (`useAccounts`, `useCreateAccount`)
 
 **-> Asignación de Titulares a Cuentas**
-- [ ] T038 [P] [US1] Crear formulario `OwnershipForm` en `apps/frontend/src/features/master-data/components/OwnershipForm.tsx`
+- [X] T038 [P] [US1] Crear formulario `OwnershipForm` en `apps/frontend/src/features/master-data/components/OwnershipForm.tsx`
   - Dentro del detalle de una cuenta, lista sus titulares actuales con % y fechas
   - Formulario para añadir titular: selector de persona, % (con guardia ≤ 100% igual que AssignmentForm), valid_from/to
   - Usa `useAssignOwner()` y muestra error 422 inline
