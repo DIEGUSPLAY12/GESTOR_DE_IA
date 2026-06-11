@@ -1,17 +1,18 @@
 import { Router } from 'express'
-import { createQueue, QUEUE_NAMES } from '../../lib/queue.js'
+import { createQueue, isQueueAvailable, QUEUE_NAMES } from '../../lib/queue.js'
 import { requireAuth, requireRole, type AuthenticatedRequest } from '../../middleware/auth.js'
+import { runImputationForPeriod } from './service.js'
 import type { ImputationJobData } from './worker.js'
 
 const router = Router()
-const imputationQueue = createQueue<ImputationJobData>(QUEUE_NAMES.IMPUTATION)
 
 const PERIOD_MONTH_RE = /^\d{4}-(0[1-9]|1[0-2])$/
 
 // POST /api/v1/imputations/calculate
 // Auth: ADMIN only
 // Body: { period_month: "YYYY-MM", exchange_rates?: Record<string, number>, target_currency?: string }
-// Response: 202 Accepted { jobId, periodMonth, status: "queued" }
+// Response (with Redis):    202 Accepted { jobId, periodMonth, status: "queued" }
+// Response (without Redis): 200 OK       { periodMonth, status: "completed", recordsInserted }
 router.post(
   '/calculate',
   requireAuth,
@@ -26,16 +27,33 @@ router.post(
         return
       }
 
-      const jobData: ImputationJobData = {
+      const serviceOpts = {
         periodMonth: period_month,
-        requestedBy: req.user?.sub ?? 'unknown',
         ...(typeof exchange_rates === 'object' && exchange_rates !== null && !Array.isArray(exchange_rates)
           ? { exchangeRates: exchange_rates as Record<string, number> }
           : {}),
         ...(typeof target_currency === 'string' ? { targetCurrency: target_currency } : {}),
       }
 
-      const job = await imputationQueue.add('calculate', jobData)
+      // No Redis → run synchronously and return the result directly
+      if (!isQueueAvailable()) {
+        const result = await runImputationForPeriod(serviceOpts)
+        res.json({
+          periodMonth: period_month,
+          status: 'completed',
+          recordsInserted: result.recordsInserted,
+          auditHash: result.auditHash,
+        })
+        return
+      }
+
+      // Redis available → enqueue background job
+      const queue = createQueue<ImputationJobData>(QUEUE_NAMES.IMPUTATION)
+      const jobData: ImputationJobData = {
+        requestedBy: req.user?.sub ?? 'unknown',
+        ...serviceOpts,
+      }
+      const job = await queue.add('calculate', jobData)
 
       res.status(202).json({
         jobId: job.id,

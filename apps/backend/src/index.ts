@@ -1,5 +1,5 @@
 import express from 'express'
-import { createWorker, QUEUE_NAMES } from './lib/queue.js'
+import { createWorker, isQueueAvailable, QUEUE_NAMES } from './lib/queue.js'
 import { imputationsRouter } from './modules/imputation/api.js'
 import { consumptionsRouter } from './modules/imputation/api_consumptions.js'
 import { peopleRouter, projectsRouter } from './modules/master-data/people_projects.js'
@@ -30,13 +30,18 @@ app.use('/api/v1/consumptions', consumptionsRouter)
 app.use('/api/v1/consultants', consultantsRouter)
 app.use('/api/v1/reports', reportsRouter)
 
-// Imputation background worker
-createWorker(QUEUE_NAMES.IMPUTATION, async (job) => {
-  const { default: runImputationJob } = await import(
-    './modules/imputation/worker.js'
-  )
-  await runImputationJob(job)
-})
+// Imputation background worker (only when Redis is configured)
+if (isQueueAvailable()) {
+  import('./modules/imputation/worker.js').then(({ default: runImputationJob }) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    createWorker(QUEUE_NAMES.IMPUTATION, (job: any) => runImputationJob(job))
+    console.log('[queue] BullMQ worker started')
+  }).catch((err: unknown) => {
+    console.error('[queue] Failed to start worker:', err)
+  })
+} else {
+  console.log('[queue] Redis not configured — imputations will run synchronously')
+}
 
 app.listen(PORT, () => {
   console.log(`Backend API listening on http://localhost:${PORT}`)

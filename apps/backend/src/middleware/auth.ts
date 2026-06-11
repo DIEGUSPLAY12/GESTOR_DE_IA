@@ -19,6 +19,17 @@ export async function requireAuth(
   res: Response,
   next: NextFunction,
 ): Promise<void> {
+  // Dev bypass: any request is treated as ADMIN when DEV_SKIP_AUTH=true
+  if (process.env['DEV_SKIP_AUTH'] === 'true') {
+    req.user = {
+      sub: 'dev-admin-local',
+      ...(true ? { email: 'admin@alten.es' } : {}),
+      ...(true ? { roles: ['ADMIN', 'PROJECT_MANAGER', 'CONSULTANT'] } : {}),
+    }
+    next()
+    return
+  }
+
   const authHeader = req.headers.authorization
   if (!authHeader?.startsWith('Bearer ')) {
     res.status(401).json({ error: 'Missing or invalid Authorization header' })
@@ -29,27 +40,35 @@ export async function requireAuth(
 
   if (!JWKS) {
     // Dev mode: skip signature verification, decode only
-    const [, payload] = token.split('.')
-    if (!payload) {
+    const [, encodedPayload] = token.split('.')
+    if (!encodedPayload) {
       res.status(401).json({ error: 'Invalid token' })
       return
     }
-    const decoded = JSON.parse(Buffer.from(payload, 'base64url').toString()) as Record<string, unknown>
+    const decoded = JSON.parse(Buffer.from(encodedPayload, 'base64url').toString()) as Record<string, unknown>
+    const email = decoded['email']
+    const roles = decoded['roles']
     req.user = {
       sub: decoded['sub'] as string,
-      email: decoded['email'] as string | undefined,
-      roles: decoded['roles'] as string[] | undefined,
+      ...(typeof email === 'string' ? { email } : {}),
+      ...(Array.isArray(roles) ? { roles: roles as string[] } : {}),
     }
     next()
     return
   }
 
   try {
-    const { payload } = await jwtVerify(token, JWKS, { audience })
+    const { payload } = await jwtVerify(
+      token,
+      JWKS,
+      ...(audience ? [{ audience }] : []),
+    )
+    const email = payload['email']
+    const roles = payload['roles']
     req.user = {
       sub: payload.sub as string,
-      email: payload['email'] as string | undefined,
-      roles: payload['roles'] as string[] | undefined,
+      ...(typeof email === 'string' ? { email } : {}),
+      ...(Array.isArray(roles) ? { roles: roles as string[] } : {}),
     }
     next()
   } catch {
