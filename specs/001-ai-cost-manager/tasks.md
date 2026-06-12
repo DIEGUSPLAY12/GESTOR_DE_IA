@@ -189,7 +189,7 @@ VITE_SUPABASE_ANON_KEY=<anon-key del proyecto>
   - `GET /api/v1/usage/me?period_month=YYYY-MM` — requireAuth; devuelve las entradas propias con join a account + project
   - Registrar en `index.ts` como `/api/v1/usage`
 
-- [ ] T048 [P] Frontend hooks de uso en `apps/frontend/src/features/usage/api/hooks.ts`
+- [X] T048 [P] Frontend hooks de uso en `apps/frontend/src/features/usage/api/hooks.ts`
   - `useMyUsage(periodMonth)` — GET `/api/v1/usage/me`
   - `useLogUsage()` — mutation POST `/api/v1/usage`; invalida `['usage', periodMonth]` y `['budgets', periodMonth]`
 
