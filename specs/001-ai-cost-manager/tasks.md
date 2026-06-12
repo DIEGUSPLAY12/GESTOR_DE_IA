@@ -200,7 +200,7 @@ VITE_SUPABASE_ANON_KEY=<anon-key del proyecto>
   - Preview en tiempo real del coste calculado: `unidades × precio_plan`
   - Al enviar usa `useLogUsage()`; muestra confirmación con coste registrado
 
-- [ ] T050 Crear `UsageHistory.tsx` — historial de uso del usuario
+- [X] T050 Crear `UsageHistory.tsx` — historial de uso del usuario
   - `apps/frontend/src/features/usage/components/UsageHistory.tsx`
   - Tabla: fecha, proyecto, cuenta de IA, unidades, coste, moneda
   - Fila de totales en `tfoot`
