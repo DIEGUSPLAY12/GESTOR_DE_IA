@@ -9,6 +9,8 @@ interface AuthContextValue {
   signIn: (email: string, password: string) => Promise<void>
   signUp: (email: string, password: string, fullName: string) => Promise<void>
   signOut: () => Promise<void>
+  verifyOtp: (email: string, token: string) => Promise<void>
+  resendVerification: (email: string) => Promise<void>
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null)
@@ -58,7 +60,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       options: { data: { full_name: fullName } },
     })
     if (error) throw error
-    // When email confirmation is disabled, Supabase returns a session immediately
     if (data.session) {
       sessionStorage.setItem('access_token', data.session.access_token)
     }
@@ -69,8 +70,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     sessionStorage.removeItem('access_token')
   }
 
+  async function verifyOtp(email: string, token: string): Promise<void> {
+    const { error } = await supabase.auth.verifyOtp({ email, token, type: 'signup' })
+    if (error) throw error
+  }
+
+  async function resendVerification(email: string): Promise<void> {
+    const { error } = await supabase.auth.resend({ email, type: 'signup' })
+    if (error) throw error
+  }
+
   return (
-    <AuthContext.Provider value={{ session, user, isInitialized, signIn, signUp, signOut }}>
+    <AuthContext.Provider value={{ session, user, isInitialized, signIn, signUp, signOut, verifyOtp, resendVerification }}>
       {children}
     </AuthContext.Provider>
   )

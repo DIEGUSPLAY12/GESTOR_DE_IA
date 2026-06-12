@@ -1,7 +1,6 @@
 import { useState, type FormEvent } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { useAuth } from '../lib/AuthContext.js'
-import { api } from '../lib/api.js'
 
 export default function RegisterPage() {
   const { signUp } = useAuth()
@@ -11,7 +10,6 @@ export default function RegisterPage() {
   const [password, setPassword] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
-  const [awaitingVerification, setAwaitingVerification] = useState(false)
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
@@ -19,38 +17,14 @@ export default function RegisterPage() {
     setLoading(true)
     try {
       await signUp(email, password, fullName)
-
-      const token = sessionStorage.getItem('access_token')
-      if (token) {
-        // Email confirmation disabled — session is active, create person and redirect
-        await api.get('/auth/me')
-        navigate('/')
-      } else {
-        // Email confirmation required — ask user to check inbox
-        setAwaitingVerification(true)
-      }
+      // Always redirect to OTP verification screen after registration
+      sessionStorage.setItem('pending_verification_email', email)
+      navigate('/verify-email')
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error al registrarse')
     } finally {
       setLoading(false)
     }
-  }
-
-  if (awaitingVerification) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
-        <div className="w-full max-w-sm bg-white rounded-lg shadow p-8 text-center">
-          <h2 className="text-xl font-bold text-gray-900 mb-2">Verifica tu correo</h2>
-          <p className="text-sm text-gray-600 mb-4">
-            Hemos enviado un enlace de confirmación a <strong>{email}</strong>. Revisa tu bandeja de
-            entrada y haz clic en el enlace para activar tu cuenta.
-          </p>
-          <Link to="/login" className="text-blue-600 text-sm hover:underline">
-            Volver al inicio de sesión
-          </Link>
-        </div>
-      </div>
-    )
   }
 
   return (
