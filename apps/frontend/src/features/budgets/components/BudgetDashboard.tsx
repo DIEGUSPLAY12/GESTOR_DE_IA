@@ -68,6 +68,43 @@ function CustomTooltip({ active, payload, label }: CustomTooltipProps) {
   )
 }
 
+function fmt(n: number): string {
+  return n.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+}
+
+interface SummaryCardsProps {
+  summaries: BudgetSummary[]
+}
+
+function SummaryCards({ summaries }: SummaryCardsProps) {
+  const totalBudget = summaries.reduce(
+    (acc, s) => acc + (s.monthly_budget != null ? Number(s.monthly_budget) : 0),
+    0,
+  )
+  const totalSpent = summaries.reduce((acc, s) => acc + Number(s.actual_cost), 0)
+  const totalRemaining = totalBudget - totalSpent
+  const remainingPositive = totalRemaining >= 0
+
+  return (
+    <div className="grid grid-cols-3 gap-4 mb-6">
+      <div className="rounded-lg border border-gray-200 bg-white px-4 py-3">
+        <p className="text-xs text-gray-500 uppercase tracking-wide">Presupuesto total</p>
+        <p className="mt-1 text-xl font-bold text-gray-900 tabular-nums">{fmt(totalBudget)} €</p>
+      </div>
+      <div className="rounded-lg border border-gray-200 bg-white px-4 py-3">
+        <p className="text-xs text-gray-500 uppercase tracking-wide">Gasto acumulado</p>
+        <p className="mt-1 text-xl font-bold text-gray-900 tabular-nums">{fmt(totalSpent)} €</p>
+      </div>
+      <div className={`rounded-lg border px-4 py-3 ${remainingPositive ? 'border-green-200 bg-green-50' : 'border-red-200 bg-red-50'}`}>
+        <p className="text-xs text-gray-500 uppercase tracking-wide">Restante</p>
+        <p className={`mt-1 text-xl font-bold tabular-nums ${remainingPositive ? 'text-green-700' : 'text-red-700'}`}>
+          {fmt(totalRemaining)} €
+        </p>
+      </div>
+    </div>
+  )
+}
+
 export function BudgetDashboard() {
   const [periodMonth, setPeriodMonth] = useState(currentPeriodMonth())
   const { data: summaries, isLoading, error } = useBudgets(periodMonth)
@@ -116,6 +153,9 @@ export function BudgetDashboard() {
 
       {!isLoading && !error && hasData && (
         <>
+          {/* Aggregate summary cards */}
+          <SummaryCards summaries={summaries!} />
+
           {/* Recharts bar chart */}
           {hasBudgets ? (
             <div className="mb-8">
@@ -170,30 +210,35 @@ export function BudgetDashboard() {
                         <th scope="col" className="px-3 py-2 text-right text-xs font-medium text-gray-500">
                           % consumido
                         </th>
+                        <th scope="col" className="px-3 py-2 text-right text-xs font-medium text-gray-500">
+                          Restante
+                        </th>
                       </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-100">
-                      {summaries!.map((s) => (
-                        <tr key={s.project_id}>
-                          <td className="px-3 py-2 font-mono text-xs">{s.project_code}</td>
-                          <td className="px-3 py-2 text-right text-gray-700">
-                            {s.monthly_budget != null
-                              ? `${Number(s.monthly_budget).toLocaleString('es-ES', {
-                                  minimumFractionDigits: 2,
-                                })} €`
-                              : '—'}
-                          </td>
-                          <td className="px-3 py-2 text-right text-gray-700">
-                            {Number(s.actual_cost).toLocaleString('es-ES', {
-                              minimumFractionDigits: 2,
-                            })}{' '}
-                            €
-                          </td>
-                          <td className="px-3 py-2 text-right text-gray-700">
-                            {s.percentage_used != null ? `${s.percentage_used.toFixed(1)}%` : '—'}
-                          </td>
-                        </tr>
-                      ))}
+                      {summaries!.map((s) => {
+                        const budget = s.monthly_budget != null ? Number(s.monthly_budget) : null
+                        const spent = Number(s.actual_cost)
+                        const remaining = budget != null ? budget - spent : null
+                        const remainingPos = remaining == null || remaining >= 0
+                        return (
+                          <tr key={s.project_id}>
+                            <td className="px-3 py-2 font-mono text-xs">{s.project_code}</td>
+                            <td className="px-3 py-2 text-right text-gray-700">
+                              {budget != null ? `${fmt(budget)} €` : '—'}
+                            </td>
+                            <td className="px-3 py-2 text-right text-gray-700">
+                              {fmt(spent)} €
+                            </td>
+                            <td className="px-3 py-2 text-right text-gray-700">
+                              {s.percentage_used != null ? `${s.percentage_used.toFixed(1)}%` : '—'}
+                            </td>
+                            <td className={`px-3 py-2 text-right font-medium ${remainingPos ? 'text-green-700' : 'text-red-600'}`}>
+                              {remaining != null ? `${fmt(remaining)} €` : '—'}
+                            </td>
+                          </tr>
+                        )
+                      })}
                     </tbody>
                   </table>
                 </div>

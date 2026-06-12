@@ -221,7 +221,7 @@ VITE_SUPABASE_ANON_KEY=<anon-key del proyecto>
   - En el endpoint `GET /api/v1/budgets`, además de sumar `imputation_result.allocated_cost`, sumar también `usage_log.calculated_cost` agrupado por `project_id` y `period_month`
   - El `actual_cost` final = suma imputaciones + suma usage_log
 
-- [ ] T053 Actualizar `BudgetDashboard.tsx` para mostrar presupuesto total / gastado / restante
+- [X] T053 Actualizar `BudgetDashboard.tsx` para mostrar presupuesto total / gastado / restante
   - Añadir tarjetas de resumen encima de la gráfica: "Presupuesto total", "Gasto acumulado", "Restante"
   - El "Restante" = monthly_budget − actual_cost (con color verde/rojo según sea positivo/negativo)
   - La tabla accesible de `<details>` ya existente añade columna "Restante"
