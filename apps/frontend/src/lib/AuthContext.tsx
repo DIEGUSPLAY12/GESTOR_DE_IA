@@ -49,12 +49,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   async function signUp(email: string, password: string, fullName: string): Promise<void> {
-    const { error } = await supabase.auth.signUp({
+    const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: { data: { full_name: fullName } },
     })
     if (error) throw error
+    // When email confirmation is disabled, Supabase returns a session immediately
+    if (data.session) {
+      sessionStorage.setItem('access_token', data.session.access_token)
+    }
   }
 
   async function signOut(): Promise<void> {

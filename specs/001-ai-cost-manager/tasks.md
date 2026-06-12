@@ -160,7 +160,7 @@ VITE_SUPABASE_ANON_KEY=<anon-key del proyecto>
   - `onAuthStateChange` para detectar expiración/logout automático
   - Crear hook `useCurrentUser()` en `apps/frontend/src/lib/useCurrentUser.ts` que llama a `/api/v1/auth/me` con TanStack Query y expone `{ person, isAdmin, isLoading }`
 
-- [ ] T044 Crear `LoginPage.tsx` y `RegisterPage.tsx`
+- [X] T044 Crear `LoginPage.tsx` y `RegisterPage.tsx`
   - `apps/frontend/src/routes/LoginPage.tsx` — formulario email + contraseña; usa `useAuth().signIn`; redirige a `/` tras éxito; muestra errores inline
   - `apps/frontend/src/routes/RegisterPage.tsx` — formulario nombre completo + email + contraseña; usa `useAuth().signUp`; llama a `/api/v1/auth/me` tras registro para crear el `person`; redirige a `/`
   - Diseño coherente con el resto de la app (Tailwind, mismo estilo de formularios)
