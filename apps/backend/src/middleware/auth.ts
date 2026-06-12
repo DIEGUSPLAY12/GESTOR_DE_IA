@@ -1,10 +1,5 @@
 import type { Request, Response, NextFunction } from 'express'
-import { createRemoteJWKSet, jwtVerify } from 'jose'
-
-const jwksUri = process.env['AZURE_AD_JWKS_URI']
-const audience = process.env['AZURE_AD_CLIENT_ID']
-
-const JWKS = jwksUri ? createRemoteJWKSet(new URL(jwksUri)) : null
+import { supabase } from '../lib/supabase.js'
 
 export interface AuthenticatedRequest extends Request {
   user?: {
@@ -38,37 +33,24 @@ export async function requireAuth(
 
   const token = authHeader.slice(7)
 
-  if (!JWKS) {
-    // Dev mode: skip signature verification, decode only
-    const [, encodedPayload] = token.split('.')
-    if (!encodedPayload) {
-      res.status(401).json({ error: 'Invalid token' })
+  try {
+    const {
+      data: { user },
+      error,
+    } = await supabase.auth.getUser(token)
+
+    if (error || !user) {
+      res.status(401).json({ error: 'Invalid or expired token' })
       return
     }
-    const decoded = JSON.parse(Buffer.from(encodedPayload, 'base64url').toString()) as Record<string, unknown>
-    const email = decoded['email']
-    const roles = decoded['roles']
-    req.user = {
-      sub: decoded['sub'] as string,
-      ...(typeof email === 'string' ? { email } : {}),
-      ...(Array.isArray(roles) ? { roles: roles as string[] } : {}),
-    }
-    next()
-    return
-  }
 
-  try {
-    const { payload } = await jwtVerify(
-      token,
-      JWKS,
-      ...(audience ? [{ audience }] : []),
-    )
-    const email = payload['email']
-    const roles = payload['roles']
+    const roles =
+      (user.app_metadata?.['roles'] as string[] | undefined) ?? ['CONSULTANT']
+
     req.user = {
-      sub: payload.sub as string,
-      ...(typeof email === 'string' ? { email } : {}),
-      ...(Array.isArray(roles) ? { roles: roles as string[] } : {}),
+      sub: user.id,
+      ...(user.email ? { email: user.email } : {}),
+      roles,
     }
     next()
   } catch {
