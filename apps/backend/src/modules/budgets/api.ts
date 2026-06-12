@@ -74,21 +74,34 @@ router.get('/', requireAuth, async (req: AuthenticatedRequest, res: Response, ne
 
     const projectIds = projects.map((p) => p.id as string)
 
-    // Aggregate allocated_cost per project for the given period
-    const { data: imputations, error: imputationError } = await supabase
-      .from('imputation_result')
-      .select('project_id, allocated_cost')
-      .eq('period_month', periodMonth)
-      .in('project_id', projectIds)
+    // Fetch both cost sources in parallel
+    const [imputationRes, usageRes] = await Promise.all([
+      supabase
+        .from('imputation_result')
+        .select('project_id, allocated_cost')
+        .eq('period_month', periodMonth)
+        .in('project_id', projectIds),
+      supabase
+        .from('usage_log')
+        .select('project_id, calculated_cost')
+        .eq('period_month', periodMonth)
+        .in('project_id', projectIds),
+    ])
 
-    if (imputationError) throw new Error(imputationError.message)
+    if (imputationRes.error) throw new Error(imputationRes.error.message)
+    if (usageRes.error) throw new Error(usageRes.error.message)
 
-    // Sum costs per project
+    // Sum costs per project: imputation_result + usage_log
     const costByProject = new Map<string, number>()
-    for (const row of imputations ?? []) {
+
+    for (const row of imputationRes.data ?? []) {
       const pid = row.project_id as string
-      const cost = Number(row.allocated_cost)
-      costByProject.set(pid, (costByProject.get(pid) ?? 0) + cost)
+      costByProject.set(pid, (costByProject.get(pid) ?? 0) + Number(row.allocated_cost))
+    }
+
+    for (const row of usageRes.data ?? []) {
+      const pid = row.project_id as string
+      costByProject.set(pid, (costByProject.get(pid) ?? 0) + Number(row.calculated_cost))
     }
 
     const summaries: BudgetSummary[] = projects.map((p) => {

@@ -217,7 +217,7 @@ VITE_SUPABASE_ANON_KEY=<anon-key del proyecto>
 
 **Goal**: El dashboard de presupuestos refleja tanto los costes del motor de imputación como los registros manuales de uso.
 
-- [ ] T052 Actualizar `budgets/api.ts` para incluir `usage_log` en el cálculo de coste real
+- [X] T052 Actualizar `budgets/api.ts` para incluir `usage_log` en el cálculo de coste real
   - En el endpoint `GET /api/v1/budgets`, además de sumar `imputation_result.allocated_cost`, sumar también `usage_log.calculated_cost` agrupado por `project_id` y `period_month`
   - El `actual_cost` final = suma imputaciones + suma usage_log
 
