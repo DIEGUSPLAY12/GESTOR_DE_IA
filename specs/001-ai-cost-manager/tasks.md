@@ -193,7 +193,7 @@ VITE_SUPABASE_ANON_KEY=<anon-key del proyecto>
   - `useMyUsage(periodMonth)` — GET `/api/v1/usage/me`
   - `useLogUsage()` — mutation POST `/api/v1/usage`; invalida `['usage', periodMonth]` y `['budgets', periodMonth]`
 
-- [ ] T049 Crear `UsageForm.tsx` — formulario para que el usuario registre uso de IA
+- [X] T049 Crear `UsageForm.tsx` — formulario para que el usuario registre uso de IA
   - `apps/frontend/src/features/usage/components/UsageForm.tsx`
   - Selectores: proyecto (solo los que el usuario tiene asignados), cuenta de IA (las activas)
   - Campo: unidades usadas + etiqueta (horas por defecto) + notas opcionales + período
