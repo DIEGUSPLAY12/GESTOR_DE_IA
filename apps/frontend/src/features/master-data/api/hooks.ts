@@ -5,7 +5,7 @@ import type {
   AiProvider,
   AccountOwnership,
   AssignOwnerInput,
-  AssignProjectInput,
+  JoinProjectInput,
   CreateAccountInput,
   CreatePersonInput,
   CreatePlanInput,
@@ -213,15 +213,15 @@ export function usePersonAssignments(personId: string) {
   })
 }
 
-export function useAssignProject() {
+export function useJoinProject() {
   const qc = useQueryClient()
   return useMutation({
-    mutationFn: ({ personId, ...input }: AssignProjectInput & { personId: string }) =>
+    mutationFn: ({ projectId, ...input }: JoinProjectInput) =>
       api
-        .post<{ data: ProjectAssignment }>(`/people/${personId}/assignments`, input)
+        .post<{ data: ProjectAssignment }>(`/projects/${projectId}/join`, input)
         .then((r) => r.data),
-    onSuccess: (_data, vars) => {
-      qc.invalidateQueries({ queryKey: KEYS.personAssignments(vars.personId) })
+    onSuccess: () => {
+      // Invalidate all person-assignment queries so UI reflects the new membership
       qc.invalidateQueries({ queryKey: KEYS.people })
     },
   })

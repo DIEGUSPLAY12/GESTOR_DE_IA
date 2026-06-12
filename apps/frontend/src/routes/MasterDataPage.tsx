@@ -1,21 +1,22 @@
 import { useState } from 'react'
 import { ProjectsTable } from '../features/master-data/components/ProjectsTable.js'
-import { AssignmentForm } from '../features/master-data/components/AssignmentForm.js'
+import { ProjectForm } from '../features/master-data/components/ProjectForm.js'
 import { ProvidersPanel } from '../features/master-data/components/ProvidersPanel.js'
 import { AccountsPanel } from '../features/master-data/components/AccountsPanel.js'
 import type { Project } from '../features/master-data/types.js'
 
-type Tab = 'projects' | 'assignments' | 'providers' | 'accounts'
+type Tab = 'projects' | 'providers' | 'accounts'
+type ProjectMode = 'list' | 'create' | 'edit'
 
 const TABS: { id: Tab; label: string }[] = [
   { id: 'projects', label: 'Proyectos' },
-  { id: 'assignments', label: 'Asignaciones' },
   { id: 'providers', label: 'Proveedores' },
   { id: 'accounts', label: 'Cuentas IA' },
 ]
 
 export default function MasterDataPage() {
   const [activeTab, setActiveTab] = useState<Tab>('projects')
+  const [projectMode, setProjectMode] = useState<ProjectMode>('list')
   const [editingProject, setEditingProject] = useState<Project | null>(null)
 
   const tabClass = (tab: Tab) =>
@@ -24,6 +25,16 @@ export default function MasterDataPage() {
         ? 'border-blue-600 text-blue-700'
         : 'border-transparent text-gray-500 hover:text-gray-700'
     }`
+
+  function handleEdit(project: Project) {
+    setEditingProject(project)
+    setProjectMode('edit')
+  }
+
+  function handleBackToList() {
+    setProjectMode('list')
+    setEditingProject(null)
+  }
 
   return (
     <div>
@@ -38,7 +49,7 @@ export default function MasterDataPage() {
             aria-controls={`tab-panel-${id}`}
             id={`tab-${id}`}
             className={tabClass(id)}
-            onClick={() => setActiveTab(id)}
+            onClick={() => { setActiveTab(id); handleBackToList() }}
           >
             {label}
           </button>
@@ -51,32 +62,28 @@ export default function MasterDataPage() {
         aria-labelledby="tab-projects"
         hidden={activeTab !== 'projects'}
       >
-        {editingProject ? (
-          <div className="mb-6 p-4 border border-blue-200 bg-blue-50 rounded">
-            <p className="text-sm text-blue-700 mb-2">
-              Editando: <strong>{editingProject.name}</strong>
-            </p>
-            <button
-              type="button"
-              className="text-xs text-blue-600 underline"
-              onClick={() => setEditingProject(null)}
-            >
-              Cancelar edición
-            </button>
+        {projectMode === 'list' ? (
+          <>
+            <div className="flex justify-end mb-4">
+              <button
+                type="button"
+                onClick={() => setProjectMode('create')}
+                className="rounded bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
+              >
+                + Nuevo proyecto
+              </button>
+            </div>
+            <ProjectsTable onEdit={handleEdit} />
+          </>
+        ) : (
+          <div className="max-w-2xl">
+            <ProjectForm
+              {...(projectMode === 'edit' && editingProject ? { project: editingProject } : {})}
+              onSuccess={handleBackToList}
+              onCancel={handleBackToList}
+            />
           </div>
-        ) : null}
-        <ProjectsTable onEdit={setEditingProject} />
-      </div>
-
-      <div
-        role="tabpanel"
-        id="tab-panel-assignments"
-        aria-labelledby="tab-assignments"
-        hidden={activeTab !== 'assignments'}
-      >
-        <div className="max-w-lg">
-          <AssignmentForm onSuccess={() => setActiveTab('projects')} />
-        </div>
+        )}
       </div>
 
       <div

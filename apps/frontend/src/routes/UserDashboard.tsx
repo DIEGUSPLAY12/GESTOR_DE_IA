@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { UsageForm } from '../features/usage/components/UsageForm.js'
 import { UsageHistory } from '../features/usage/components/UsageHistory.js'
+import { JoinProjectSection } from '../features/master-data/components/JoinProjectSection.js'
 import { useMyUsage } from '../features/usage/api/hooks.js'
 import { useCurrentUser } from '../lib/useCurrentUser.js'
 
@@ -68,6 +69,14 @@ export default function UserDashboard() {
         <UsageForm periodMonth={periodMonth} />
         <UsageHistory periodMonth={periodMonth} />
       </div>
+
+      {/* Projects section */}
+      {person && (
+        <div className="mt-8">
+          <h2 className="text-lg font-semibold text-gray-900 mb-4">Mis proyectos</h2>
+          <JoinProjectSection personId={person.id} />
+        </div>
+      )}
     </div>
   )
 }

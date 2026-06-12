@@ -66,9 +66,9 @@ export interface ProjectAssignment {
   id: string
   person_id: string
   project_id: string
-  percentage: string
   valid_from: string
   valid_to: string | null
+  project?: Pick<Project, 'id' | 'code' | 'name' | 'start_date' | 'end_date'>
 }
 
 // ─── Request/Response shapes ──────────────────────────────────────────────────
@@ -118,9 +118,8 @@ export interface AssignOwnerInput {
   valid_to?: string
 }
 
-export interface AssignProjectInput {
-  project_id: string
-  percentage: number
+export interface JoinProjectInput {
+  projectId: string
   valid_from: string
   valid_to?: string
 }

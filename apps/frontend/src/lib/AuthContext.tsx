@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react'
 import type { Session, User } from '@supabase/supabase-js'
+import { useQueryClient } from '@tanstack/react-query'
 import { supabase } from './supabase.js'
 
 interface AuthContextValue {
@@ -17,6 +18,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null)
   const [user, setUser] = useState<User | null>(null)
   const [isInitialized, setIsInitialized] = useState(false)
+  const queryClient = useQueryClient()
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
@@ -66,6 +68,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   async function signOut(): Promise<void> {
     await supabase.auth.signOut()
     sessionStorage.removeItem('access_token')
+    // Clear all cached query data so the next user starts with a clean slate
+    queryClient.clear()
   }
 
   return (

@@ -9,6 +9,12 @@ export interface AuthenticatedRequest extends Request {
   }
 }
 
+function rolesFromPersonRole(role: string | null | undefined): string[] {
+  if (role === 'ADMIN') return ['ADMIN', 'PROJECT_MANAGER', 'CONSULTANT']
+  if (role === 'PROJECT_MANAGER') return ['PROJECT_MANAGER', 'CONSULTANT']
+  return ['CONSULTANT']
+}
+
 export async function requireAuth(
   req: AuthenticatedRequest,
   res: Response,
@@ -44,8 +50,21 @@ export async function requireAuth(
       return
     }
 
-    const roles =
-      (user.app_metadata?.['roles'] as string[] | undefined) ?? ['CONSULTANT']
+    // Use person.role from the DB as the single source of truth for authorization.
+    // This way setting person.role = 'ADMIN' in the DB is sufficient for both
+    // frontend display and backend API access — no need to also set app_metadata.
+    // Falls back to CONSULTANT for users whose person record doesn't exist yet.
+    let roles: string[] = ['CONSULTANT']
+    if (user.email) {
+      const { data: person } = await supabase
+        .from('person')
+        .select('role')
+        .eq('email', user.email)
+        .is('deleted_at', null)
+        .maybeSingle()
+
+      roles = person ? rolesFromPersonRole(person.role as string) : ['CONSULTANT']
+    }
 
     req.user = {
       sub: user.id,

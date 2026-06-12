@@ -1,6 +1,7 @@
 import { Router } from 'express'
 import { supabase } from '../../lib/supabase.js'
 import { requireAuth, requireRole } from '../../middleware/auth.js'
+import type { AuthenticatedRequest } from '../../middleware/auth.js'
 
 // ─── People router ────────────────────────────────────────────────────────────
 
@@ -14,9 +15,35 @@ peopleRouter.get('/', requireAuth, async (req, res, next) => {
     let query = supabase.from('person').select('*').order('full_name')
     if (!includeDeleted) query = query.is('deleted_at', null)
 
-    const { data, error } = await query
+    const { data: persons, error } = await query
     if (error) throw new Error(error.message)
-    res.json({ data: data ?? [] })
+
+    if (!includeDeleted && persons && persons.length > 0) {
+      // Cross-reference with Supabase Auth to filter out users deleted from the
+      // Auth dashboard who still have an active person record in the DB.
+      const { data: authData } = await supabase.auth.admin.listUsers({ perPage: 1000 })
+      const activeEmails = new Set((authData?.users ?? []).map((u) => u.email).filter(Boolean))
+
+      const orphanIds: string[] = []
+      const active = (persons as { id: string; email: string }[]).filter((p) => {
+        if (activeEmails.has(p.email)) return true
+        orphanIds.push(p.id)
+        return false
+      })
+
+      // Soft-delete orphaned records so subsequent queries don't need to re-check
+      if (orphanIds.length > 0) {
+        await supabase
+          .from('person')
+          .update({ deleted_at: new Date().toISOString() })
+          .in('id', orphanIds)
+      }
+
+      res.json({ data: active })
+      return
+    }
+
+    res.json({ data: persons ?? [] })
   } catch (err) {
     next(err)
   }
@@ -58,15 +85,40 @@ peopleRouter.post('/', requireAuth, requireRole('ADMIN'), async (req, res, next)
 })
 
 // PATCH /api/v1/people/:id
-peopleRouter.patch('/:id', requireAuth, requireRole('ADMIN'), async (req, res, next) => {
+// Admins can update any person and any field.
+// Non-admins can only update their own full_name (self-profile edit).
+peopleRouter.patch('/:id', requireAuth, async (req: import('../../middleware/auth.js').AuthenticatedRequest, res, next) => {
   try {
     const { id } = req.params as { id: string }
+    const isAdmin = req.user?.roles?.includes('ADMIN') ?? false
     const body = req.body as Record<string, unknown>
     const updates: Record<string, unknown> = {}
 
-    if (typeof body['email'] === 'string') updates['email'] = body['email']
-    if (typeof body['full_name'] === 'string') updates['full_name'] = body['full_name']
-    if (typeof body['role'] === 'string') updates['role'] = body['role']
+    if (isAdmin) {
+      if (typeof body['email'] === 'string') updates['email'] = body['email']
+      if (typeof body['full_name'] === 'string') updates['full_name'] = body['full_name']
+      if (typeof body['role'] === 'string') updates['role'] = body['role']
+    } else {
+      // Non-admins: verify the target record belongs to the authenticated user
+      const email = req.user?.email
+      if (!email) {
+        res.status(401).json({ error: 'Unauthorized' })
+        return
+      }
+      const { data: ownPerson } = await supabase
+        .from('person')
+        .select('id')
+        .eq('email', email)
+        .is('deleted_at', null)
+        .maybeSingle()
+
+      if (!ownPerson || (ownPerson as { id: string }).id !== id) {
+        res.status(403).json({ error: 'You can only update your own profile' })
+        return
+      }
+      // Only full_name is editable by the owner
+      if (typeof body['full_name'] === 'string') updates['full_name'] = body['full_name']
+    }
 
     if (Object.keys(updates).length === 0) {
       res.status(400).json({ error: 'No valid fields provided for update' })
@@ -253,6 +305,110 @@ projectsRouter.delete('/:id', requireAuth, requireRole('ADMIN'), async (req, res
 
     if (error) throw new Error(error.message)
     res.json({ message: 'Project soft-deleted' })
+  } catch (err) {
+    next(err)
+  }
+})
+
+// GET /api/v1/people/:personId/assignments
+peopleRouter.get('/:personId/assignments', requireAuth, async (req, res, next) => {
+  try {
+    const { personId } = req.params as { personId: string }
+    const { data, error } = await supabase
+      .from('project_assignment')
+      .select('*, project:project_id(id, code, name, start_date, end_date)')
+      .eq('person_id', personId)
+      .order('valid_from', { ascending: false })
+    if (error) throw new Error(error.message)
+    res.json({ data: data ?? [] })
+  } catch (err) {
+    next(err)
+  }
+})
+
+// POST /api/v1/projects/:projectId/join
+// Any authenticated user can join a project within its date range.
+// percentage is set to 100 to satisfy the DB constraint (field is hidden from UI).
+projectsRouter.post('/:projectId/join', requireAuth, async (req: AuthenticatedRequest, res, next) => {
+  try {
+    const { projectId } = req.params as { projectId: string }
+    const body = req.body as Record<string, unknown>
+    const valid_from = body['valid_from']
+    const valid_to = body['valid_to']
+
+    if (typeof valid_from !== 'string' || !valid_from) {
+      res.status(400).json({ error: 'valid_from es obligatorio' })
+      return
+    }
+
+    const email = req.user?.email
+    if (!email) { res.status(401).json({ error: 'Unauthorized' }); return }
+
+    const { data: person } = await supabase
+      .from('person')
+      .select('id')
+      .eq('email', email)
+      .is('deleted_at', null)
+      .maybeSingle()
+    if (!person) { res.status(404).json({ error: 'Perfil de usuario no encontrado' }); return }
+
+    const { data: project, error: projectError } = await supabase
+      .from('project')
+      .select('start_date, end_date')
+      .eq('id', projectId)
+      .is('deleted_at', null)
+      .maybeSingle()
+    if (projectError || !project) { res.status(404).json({ error: 'Proyecto no encontrado' }); return }
+
+    const projectStart = project.start_date as string
+    const projectEnd = (project.end_date as string | null) ?? null
+
+    if (valid_from < projectStart) {
+      res.status(400).json({ error: `La fecha de inicio no puede ser anterior al inicio del proyecto (${projectStart})` })
+      return
+    }
+    if (projectEnd && valid_from > projectEnd) {
+      res.status(400).json({ error: `La fecha de inicio no puede ser posterior al fin del proyecto (${projectEnd})` })
+      return
+    }
+    if (typeof valid_to === 'string' && valid_to) {
+      if (valid_to < valid_from) {
+        res.status(400).json({ error: 'La fecha de fin no puede ser anterior a la fecha de inicio' })
+        return
+      }
+      if (projectEnd && valid_to > projectEnd) {
+        res.status(400).json({ error: `La fecha de fin no puede ser posterior al fin del proyecto (${projectEnd})` })
+        return
+      }
+    }
+
+    // Prevent duplicate active membership
+    const { data: existing } = await supabase
+      .from('project_assignment')
+      .select('id')
+      .eq('person_id', (person as { id: string }).id)
+      .eq('project_id', projectId)
+      .is('valid_to', null)
+      .maybeSingle()
+    if (existing) {
+      res.status(409).json({ error: 'Ya estás participando en este proyecto' })
+      return
+    }
+
+    const { data, error: insertError } = await supabase
+      .from('project_assignment')
+      .insert({
+        person_id: (person as { id: string }).id,
+        project_id: projectId,
+        percentage: 100,
+        valid_from,
+        ...(typeof valid_to === 'string' && valid_to ? { valid_to } : {}),
+      })
+      .select()
+      .single()
+
+    if (insertError) throw new Error(insertError.message)
+    res.status(201).json({ data })
   } catch (err) {
     next(err)
   }
