@@ -177,7 +177,7 @@ VITE_SUPABASE_ANON_KEY=<anon-key del proyecto>
 
 **Goal**: Dar a los usuarios con rol CONSULTANT/PROJECT_MANAGER una pantalla propia donde puedan ver sus proyectos activos, registrar el uso de sus herramientas de IA y ver su historial de costes.
 
-- [ ] T046 Migración `0004_usage_log.sql` — tabla de registro de uso de IA
+- [X] T046 Migración `0004_usage_log.sql` — tabla de registro de uso de IA
   - Crear `apps/backend/supabase/migrations/0004_usage_log.sql`
   - Tabla `usage_log`: `id UUID PK`, `person_id UUID → person`, `account_id UUID → ai_account`, `project_id UUID → project`, `units_used DECIMAL(19,4) NOT NULL` (horas u otras unidades), `unit_label TEXT DEFAULT 'hours'`, `calculated_cost DECIMAL(19,4) NOT NULL`, `currency CHAR(3) DEFAULT 'EUR'`, `period_month CHAR(7)`, `notes TEXT`, `created_at TIMESTAMPTZ DEFAULT now()`
   - RLS: solo el propio usuario puede leer/insertar sus filas; ADMIN puede leer todo
