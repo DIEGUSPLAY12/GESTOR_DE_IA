@@ -7,6 +7,7 @@ import { providersRouter, accountsRouter } from './modules/master-data/accounts.
 import { budgetsRouter } from './modules/budgets/api.js'
 import { consultantsRouter } from './modules/consultants/api.js'
 import { reportsRouter } from './modules/reports/api.js'
+import { authRouter } from './modules/auth/api.js'
 
 const app = express()
 const PORT = Number(process.env['PORT'] ?? 3000)
@@ -20,6 +21,7 @@ app.get('/health', (_req, res) => {
 })
 
 // Module routes
+app.use('/api/v1/auth', authRouter)
 app.use('/api/v1/people', peopleRouter)
 app.use('/api/v1/projects', projectsRouter)
 app.use('/api/v1/providers', providersRouter)

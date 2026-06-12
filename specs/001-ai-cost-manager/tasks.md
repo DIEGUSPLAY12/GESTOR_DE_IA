@@ -147,7 +147,7 @@ VITE_SUPABASE_ANON_KEY=<anon-key del proyecto>
   - Actualizar `apps/backend/src/lib/supabase.ts` si hace falta para exponer el cliente en el middleware
   - El `req.user.sub` debe ser el UUID de Supabase Auth (ya es un UUID válido)
 
-- [ ] T042 Añadir endpoint `GET /api/v1/auth/me` — perfil del usuario autenticado
+- [X] T042 Añadir endpoint `GET /api/v1/auth/me` — perfil del usuario autenticado
   - Crear `apps/backend/src/modules/auth/api.ts` con `router.get('/me', requireAuth, ...)`
   - Buscar `person` por `email` del token Supabase; si no existe, crear registro `person` automáticamente con `role = 'CONSULTANT'`
   - Devolver `{ id, email, full_name, role }` — el frontend lo usará para saber el rol
