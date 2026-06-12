@@ -206,7 +206,7 @@ VITE_SUPABASE_ANON_KEY=<anon-key del proyecto>
   - Fila de totales en `tfoot`
   - Usa `useMyUsage(periodMonth)`
 
-- [ ] T051 Crear `UserDashboard.tsx` — página principal para usuarios no-admin
+- [X] T051 Crear `UserDashboard.tsx` — página principal para usuarios no-admin
   - `apps/frontend/src/routes/UserDashboard.tsx`
   - Ruta `/dashboard`
   - Sección superior: resumen del período (total horas registradas, total coste)

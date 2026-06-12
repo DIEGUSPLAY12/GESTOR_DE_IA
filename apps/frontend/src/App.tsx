@@ -9,6 +9,7 @@ const ConsultantPage = lazy(() => import('./routes/ConsultantPage.js'))
 const ReportsPage = lazy(() => import('./routes/ReportsPage.js'))
 const LoginPage = lazy(() => import('./routes/LoginPage.js'))
 const RegisterPage = lazy(() => import('./routes/RegisterPage.js'))
+const UserDashboard = lazy(() => import('./routes/UserDashboard.js'))
 
 function LoadingFallback() {
   return (
@@ -123,6 +124,7 @@ export default function App() {
             <Route path="/budgets" element={<BudgetsPage />} />
             <Route path="/consultant" element={<ConsultantPage />} />
             <Route path="/reports" element={<ReportsPage />} />
+            <Route path="/dashboard" element={<UserDashboard />} />
           </Route>
         </Route>
 
