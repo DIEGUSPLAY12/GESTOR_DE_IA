@@ -153,7 +153,7 @@ VITE_SUPABASE_ANON_KEY=<anon-key del proyecto>
   - Devolver `{ id, email, full_name, role }` — el frontend lo usará para saber el rol
   - Registrar la ruta en `apps/backend/src/index.ts` como `/api/v1/auth`
 
-- [ ] T043 Crear `AuthContext` y hook `useAuth` en el frontend
+- [X] T043 Crear `AuthContext` y hook `useAuth` en el frontend
   - Crear `apps/frontend/src/lib/AuthContext.tsx` — Provider que envuelve la app con la sesión Supabase
   - Exponer: `session`, `user`, `signIn(email, password)`, `signUp(email, password, fullName)`, `signOut()`
   - `signIn` guarda el `access_token` en `sessionStorage` (compatibilidad con `api.ts` existente)
