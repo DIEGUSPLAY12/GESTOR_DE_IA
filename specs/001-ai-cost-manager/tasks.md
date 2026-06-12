@@ -165,7 +165,7 @@ VITE_SUPABASE_ANON_KEY=<anon-key del proyecto>
   - `apps/frontend/src/routes/RegisterPage.tsx` — formulario nombre completo + email + contraseña; usa `useAuth().signUp`; llama a `/api/v1/auth/me` tras registro para crear el `person`; redirige a `/`
   - Diseño coherente con el resto de la app (Tailwind, mismo estilo de formularios)
 
-- [ ] T045 Proteger rutas y actualizar `App.tsx` con navegación por roles
+- [X] T045 Proteger rutas y actualizar `App.tsx` con navegación por roles
   - Crear componente `ProtectedRoute` — redirige a `/login` si no hay sesión activa
   - Envolver todas las rutas existentes con `ProtectedRoute`
   - Añadir rutas públicas `/login` y `/register` (accesibles sin sesión)
