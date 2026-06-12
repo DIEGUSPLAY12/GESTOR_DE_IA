@@ -183,7 +183,7 @@ VITE_SUPABASE_ANON_KEY=<anon-key del proyecto>
   - RLS: solo el propio usuario puede leer/insertar sus filas; ADMIN puede leer todo
   - Ejecutar en Supabase SQL Editor
 
-- [ ] T047 Backend endpoints de registro de uso: `POST /api/v1/usage` y `GET /api/v1/usage/me`
+- [X] T047 Backend endpoints de registro de uso: `POST /api/v1/usage` y `GET /api/v1/usage/me`
   - Crear `apps/backend/src/modules/usage/api.ts`
   - `POST /api/v1/usage` — requireAuth; body: `{ account_id, project_id, units_used, unit_label?, notes?, period_month }`; calcula `calculated_cost = pricing_plan.unit_price × units_used`; inserta en `usage_log`
   - `GET /api/v1/usage/me?period_month=YYYY-MM` — requireAuth; devuelve las entradas propias con join a account + project
