@@ -15,7 +15,7 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "typecheck": "pnpm -r typecheck",
-    "dev": "pnpm --parallel -r dev"
+    "dev": "pnpm --parallel --filter @gestor-ia/backend --filter @gestor-ia/frontend dev"
   },
   "devDependencies": {
     "@eslint/js": "^9.6.0",

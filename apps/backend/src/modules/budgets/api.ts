@@ -41,19 +41,25 @@ router.get('/', requireAuth, async (req: AuthenticatedRequest, res: Response, ne
       return
     }
 
-    // Sub from JWT — set by requireAuth middleware
     const currentUserId = req.user?.sub
     if (!currentUserId) {
       res.status(401).json({ error: 'Unauthorized' })
       return
     }
 
-    // Fetch projects managed by the current user
+    const isAdmin = req.user?.roles?.includes('ADMIN') ?? false
+    const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+    const subIsUuid = UUID_RE.test(currentUserId)
+
+    // ADMINs (or dev bypass) see all projects; PMs only see their own
     let projectQuery = supabase
       .from('project')
       .select('id, name, code, monthly_budget')
-      .eq('project_manager_id', currentUserId)
       .is('deleted_at', null)
+
+    if (!isAdmin && subIsUuid) {
+      projectQuery = projectQuery.eq('project_manager_id', currentUserId)
+    }
 
     if (projectId) {
       projectQuery = projectQuery.eq('id', projectId)

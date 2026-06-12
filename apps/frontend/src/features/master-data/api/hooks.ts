@@ -1,6 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { api } from '../../../lib/api.js'
-import { DEMO_PROJECTS, DEMO_PEOPLE, DEMO_PROVIDERS, DEMO_PLANS, DEMO_ACCOUNTS } from '../../../lib/demo-data.js'
 import type {
   AiAccount,
   AiProvider,
@@ -37,13 +36,7 @@ export const KEYS = {
 export function usePersons() {
   return useQuery({
     queryKey: KEYS.people,
-    queryFn: async () => {
-      try {
-        return await api.get<{ data: Person[] }>('/people').then((r) => r.data)
-      } catch {
-        return DEMO_PEOPLE
-      }
-    },
+    queryFn: () => api.get<{ data: Person[] }>('/people').then((r) => r.data),
   })
 }
 
@@ -78,13 +71,7 @@ export function useDeletePerson() {
 export function useProjects() {
   return useQuery({
     queryKey: KEYS.projects,
-    queryFn: async () => {
-      try {
-        return await api.get<{ data: Project[] }>('/projects').then((r) => r.data)
-      } catch {
-        return DEMO_PROJECTS
-      }
-    },
+    queryFn: () => api.get<{ data: Project[] }>('/projects').then((r) => r.data),
   })
 }
 
@@ -119,13 +106,7 @@ export function useDeleteProject() {
 export function useProviders() {
   return useQuery({
     queryKey: KEYS.providers,
-    queryFn: async () => {
-      try {
-        return await api.get<{ data: AiProvider[] }>('/providers').then((r) => r.data)
-      } catch {
-        return DEMO_PROVIDERS
-      }
-    },
+    queryFn: () => api.get<{ data: AiProvider[] }>('/providers').then((r) => r.data),
   })
 }
 
@@ -149,15 +130,8 @@ export function useDeleteProvider() {
 export function usePlans(providerId: string) {
   return useQuery({
     queryKey: KEYS.plans(providerId),
-    queryFn: async () => {
-      try {
-        return await api
-          .get<{ data: PricingPlan[] }>(`/providers/${providerId}/plans`)
-          .then((r) => r.data)
-      } catch {
-        return DEMO_PLANS.filter((p) => p.provider_id === providerId)
-      }
-    },
+    queryFn: () =>
+      api.get<{ data: PricingPlan[] }>(`/providers/${providerId}/plans`).then((r) => r.data),
     enabled: Boolean(providerId),
   })
 }
@@ -180,13 +154,7 @@ export function useCreatePlan() {
 export function useAccounts() {
   return useQuery({
     queryKey: KEYS.accounts,
-    queryFn: async () => {
-      try {
-        return await api.get<{ data: AiAccount[] }>('/accounts').then((r) => r.data)
-      } catch {
-        return DEMO_ACCOUNTS
-      }
-    },
+    queryFn: () => api.get<{ data: AiAccount[] }>('/accounts').then((r) => r.data),
   })
 }
 
