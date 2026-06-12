@@ -9,7 +9,6 @@ const ConsultantPage = lazy(() => import('./routes/ConsultantPage.js'))
 const ReportsPage = lazy(() => import('./routes/ReportsPage.js'))
 const LoginPage = lazy(() => import('./routes/LoginPage.js'))
 const RegisterPage = lazy(() => import('./routes/RegisterPage.js'))
-const VerifyEmailPage = lazy(() => import('./routes/VerifyEmailPage.js'))
 const UserDashboard = lazy(() => import('./routes/UserDashboard.js'))
 const ProfilePage = lazy(() => import('./routes/ProfilePage.js'))
 
@@ -168,7 +167,6 @@ export default function App() {
         {/* Public routes */}
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
-        <Route path="/verify-email" element={<VerifyEmailPage />} />
 
         {/* Protected routes */}
         <Route element={<ProtectedRoute />}>

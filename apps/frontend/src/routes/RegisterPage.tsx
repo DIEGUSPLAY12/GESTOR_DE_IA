@@ -17,9 +17,7 @@ export default function RegisterPage() {
     setLoading(true)
     try {
       await signUp(email, password, fullName)
-      // Always redirect to OTP verification screen after registration
-      sessionStorage.setItem('pending_verification_email', email)
-      navigate('/verify-email')
+      navigate('/')
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error al registrarse')
     } finally {

@@ -9,8 +9,6 @@ interface AuthContextValue {
   signIn: (email: string, password: string) => Promise<void>
   signUp: (email: string, password: string, fullName: string) => Promise<void>
   signOut: () => Promise<void>
-  verifyOtp: (email: string, token: string) => Promise<void>
-  resendVerification: (email: string) => Promise<void>
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null)
@@ -70,18 +68,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     sessionStorage.removeItem('access_token')
   }
 
-  async function verifyOtp(email: string, token: string): Promise<void> {
-    const { error } = await supabase.auth.verifyOtp({ email, token, type: 'signup' })
-    if (error) throw error
-  }
-
-  async function resendVerification(email: string): Promise<void> {
-    const { error } = await supabase.auth.resend({ email, type: 'signup' })
-    if (error) throw error
-  }
-
   return (
-    <AuthContext.Provider value={{ session, user, isInitialized, signIn, signUp, signOut, verifyOtp, resendVerification }}>
+    <AuthContext.Provider value={{ session, user, isInitialized, signIn, signUp, signOut }}>
       {children}
     </AuthContext.Provider>
   )
