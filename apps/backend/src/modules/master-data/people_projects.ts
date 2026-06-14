@@ -3,6 +3,16 @@ import { supabase } from '../../lib/supabase.js'
 import { requireAuth, requireRole } from '../../middleware/auth.js'
 import type { AuthenticatedRequest } from '../../middleware/auth.js'
 
+async function resolvePersonByEmail(email: string): Promise<string | null> {
+  const { data } = await supabase
+    .from('person')
+    .select('id')
+    .eq('email', email)
+    .is('deleted_at', null)
+    .maybeSingle()
+  return data ? (data as { id: string }).id : null
+}
+
 // ─── People router ────────────────────────────────────────────────────────────
 
 const peopleRouter = Router()
@@ -409,6 +419,237 @@ projectsRouter.post('/:projectId/join', requireAuth, async (req: AuthenticatedRe
 
     if (insertError) throw new Error(insertError.message)
     res.status(201).json({ data })
+  } catch (err) {
+    next(err)
+  }
+})
+
+// GET /api/v1/projects/:projectId/my-assignment
+// Returns the current user's active (or most recent) assignment for a project
+projectsRouter.get('/:projectId/my-assignment', requireAuth, async (req: AuthenticatedRequest, res, next) => {
+  try {
+    const { projectId } = req.params as { projectId: string }
+    const email = req.user?.email
+    if (!email) { res.status(401).json({ error: 'Unauthorized' }); return }
+    const personId = await resolvePersonByEmail(email)
+    if (!personId) { res.status(404).json({ error: 'Perfil de usuario no encontrado' }); return }
+
+    const { data, error } = await supabase
+      .from('project_assignment')
+      .select('id, valid_from, valid_to, person_id, project_id')
+      .eq('person_id', personId)
+      .eq('project_id', projectId)
+      .order('valid_from', { ascending: false })
+      .limit(1)
+      .maybeSingle()
+
+    if (error) throw new Error(error.message)
+    res.json({ data: data ?? null })
+  } catch (err) {
+    next(err)
+  }
+})
+
+// POST /api/v1/projects/:projectId/leave
+// Sets valid_to = yesterday on the user's active assignment (shows Unirse again immediately)
+projectsRouter.post('/:projectId/leave', requireAuth, async (req: AuthenticatedRequest, res, next) => {
+  try {
+    const { projectId } = req.params as { projectId: string }
+    const email = req.user?.email
+    if (!email) { res.status(401).json({ error: 'Unauthorized' }); return }
+    const personId = await resolvePersonByEmail(email)
+    if (!personId) { res.status(404).json({ error: 'Perfil de usuario no encontrado' }); return }
+
+    const today = new Date()
+    const yesterday = new Date(today.getTime() - 86400000).toISOString().slice(0, 10)
+
+    const { data: assignment } = await supabase
+      .from('project_assignment')
+      .select('id')
+      .eq('person_id', personId)
+      .eq('project_id', projectId)
+      .is('valid_to', null)
+      .maybeSingle()
+
+    if (!assignment) {
+      res.status(404).json({ error: 'No tienes una participación activa en este proyecto' })
+      return
+    }
+
+    const { error } = await supabase
+      .from('project_assignment')
+      .update({ valid_to: yesterday })
+      .eq('id', (assignment as { id: string }).id)
+
+    if (error) throw new Error(error.message)
+    res.json({ message: 'Has abandonado el proyecto' })
+  } catch (err) {
+    next(err)
+  }
+})
+
+// GET /api/v1/projects/:projectId/usage
+// Returns the current user's AI usage entries for a project (all time)
+projectsRouter.get('/:projectId/usage', requireAuth, async (req: AuthenticatedRequest, res, next) => {
+  try {
+    const { projectId } = req.params as { projectId: string }
+    const email = req.user?.email
+    if (!email) { res.status(401).json({ error: 'Unauthorized' }); return }
+    const personId = await resolvePersonByEmail(email)
+    if (!personId) { res.status(404).json({ error: 'Perfil de usuario no encontrado' }); return }
+
+    const { data, error } = await supabase
+      .from('usage_log')
+      .select(`
+        id, units_used, unit_label, calculated_cost, currency, period_month, notes, created_at,
+        account:account_id (
+          external_identifier,
+          pricing_plan:pricing_plan_id (
+            name, unit_price,
+            provider:provider_id ( name )
+          )
+        )
+      `)
+      .eq('person_id', personId)
+      .eq('project_id', projectId)
+      .order('created_at', { ascending: false })
+
+    if (error) throw new Error(error.message)
+    res.json({ data: data ?? [] })
+  } catch (err) {
+    next(err)
+  }
+})
+
+// POST /api/v1/projects/:projectId/usage
+// Logs AI hours for a project. Cost = hours × (unit_price / 160) for PER_SEAT plans.
+projectsRouter.post('/:projectId/usage', requireAuth, async (req: AuthenticatedRequest, res, next) => {
+  try {
+    const { projectId } = req.params as { projectId: string }
+    const body = req.body as Record<string, unknown>
+    const { account_id, hours, period_month } = body
+
+    if (typeof account_id !== 'string' || !account_id) {
+      res.status(400).json({ error: 'account_id es obligatorio' }); return
+    }
+    if (typeof hours !== 'number' || hours <= 0) {
+      res.status(400).json({ error: 'hours debe ser un número positivo' }); return
+    }
+    if (typeof period_month !== 'string' || !/^\d{4}-(0[1-9]|1[0-2])$/.test(period_month)) {
+      res.status(400).json({ error: 'period_month debe tener formato YYYY-MM' }); return
+    }
+
+    const email = req.user?.email
+    if (!email) { res.status(401).json({ error: 'Unauthorized' }); return }
+    const personId = await resolvePersonByEmail(email)
+    if (!personId) { res.status(404).json({ error: 'Perfil de usuario no encontrado' }); return }
+
+    // Fetch account + plan details
+    const { data: account, error: accError } = await supabase
+      .from('ai_account')
+      .select('id, pricing_plan:pricing_plan_id(type, unit_price, currency)')
+      .eq('id', account_id)
+      .is('deleted_at', null)
+      .maybeSingle()
+
+    if (accError || !account) { res.status(404).json({ error: 'Cuenta de IA no encontrada' }); return }
+
+    const plan = (account.pricing_plan as unknown) as { type: string; unit_price: string; currency: string } | null
+    if (!plan) { res.status(422).json({ error: 'La cuenta no tiene plan de precios asociado' }); return }
+
+    // PER_SEAT: divide monthly price by 160 working hours
+    const unitPrice = Number(plan.unit_price)
+    const effectiveHourlyRate = plan.type === 'PER_SEAT' ? unitPrice / 160.0 : unitPrice
+    const calculatedCost = Math.round(hours * effectiveHourlyRate * 10000) / 10000
+
+    const { data: created, error: insertError } = await supabase
+      .from('usage_log')
+      .insert({
+        person_id: personId,
+        account_id,
+        project_id: projectId,
+        units_used: hours,
+        unit_label: 'horas',
+        calculated_cost: calculatedCost,
+        currency: plan.currency,
+        period_month,
+      })
+      .select('id, units_used, unit_label, calculated_cost, currency, period_month, created_at')
+      .single()
+
+    if (insertError) throw new Error(insertError.message)
+    res.status(201).json({ data: created })
+  } catch (err) {
+    next(err)
+  }
+})
+
+// PATCH /api/v1/projects/:projectId/usage/:usageId
+// Updates hours and recalculates cost
+projectsRouter.patch('/:projectId/usage/:usageId', requireAuth, async (req: AuthenticatedRequest, res, next) => {
+  try {
+    const { projectId, usageId } = req.params as { projectId: string; usageId: string }
+    const body = req.body as Record<string, unknown>
+    const { hours } = body
+
+    if (typeof hours !== 'number' || hours <= 0) {
+      res.status(400).json({ error: 'hours debe ser un número positivo' }); return
+    }
+
+    const email = req.user?.email
+    if (!email) { res.status(401).json({ error: 'Unauthorized' }); return }
+    const personId = await resolvePersonByEmail(email)
+    if (!personId) { res.status(404).json({ error: 'Perfil de usuario no encontrado' }); return }
+
+    // Verify ownership and get account info for recalculation
+    const { data: existing } = await supabase
+      .from('usage_log')
+      .select('id, account_id, account:account_id(pricing_plan:pricing_plan_id(type, unit_price))')
+      .eq('id', usageId)
+      .eq('person_id', personId)
+      .eq('project_id', projectId)
+      .maybeSingle()
+
+    if (!existing) { res.status(404).json({ error: 'Registro no encontrado' }); return }
+
+    const plan = ((existing as Record<string, unknown>)['account'] as Record<string, unknown> | null)
+      ?.['pricing_plan'] as { type: string; unit_price: string } | null
+    const unitPrice = plan ? Number(plan.unit_price) : 0
+    const effectiveHourlyRate = plan?.type === 'PER_SEAT' ? unitPrice / 160.0 : unitPrice
+    const calculatedCost = Math.round(hours * effectiveHourlyRate * 10000) / 10000
+
+    const { data, error } = await supabase
+      .from('usage_log')
+      .update({ units_used: hours, calculated_cost: calculatedCost })
+      .eq('id', usageId)
+      .select('id, units_used, unit_label, calculated_cost, currency, period_month, created_at')
+      .single()
+
+    if (error) throw new Error(error.message)
+    res.json({ data })
+  } catch (err) {
+    next(err)
+  }
+})
+
+// DELETE /api/v1/projects/:projectId/usage/:usageId
+projectsRouter.delete('/:projectId/usage/:usageId', requireAuth, async (req: AuthenticatedRequest, res, next) => {
+  try {
+    const { projectId, usageId } = req.params as { projectId: string; usageId: string }
+    const email = req.user?.email
+    if (!email) { res.status(401).json({ error: 'Unauthorized' }); return }
+    const personId = await resolvePersonByEmail(email)
+    if (!personId) { res.status(404).json({ error: 'Perfil de usuario no encontrado' }); return }
+
+    const { error } = await supabase
+      .from('usage_log')
+      .delete()
+      .eq('id', usageId)
+      .eq('person_id', personId)
+      .eq('project_id', projectId)
+
+    if (error) throw new Error(error.message)
+    res.json({ message: 'Registro de uso eliminado' })
   } catch (err) {
     next(err)
   }

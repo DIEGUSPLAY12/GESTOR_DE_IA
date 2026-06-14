@@ -16,6 +16,9 @@ import type {
   PricingPlan,
   Project,
   ProjectAssignment,
+  ProjectUsageEntry,
+  AddProjectUsageInput,
+  UpdateProjectUsageInput,
   UpdatePersonInput,
   UpdateProjectInput,
 } from '../types.js'
@@ -31,6 +34,8 @@ export const KEYS = {
   accountOwners: (accountId: string) => ['accounts', accountId, 'owners'] as const,
   myAccounts: ['accounts', 'mine'] as const,
   personAssignments: (personId: string) => ['people', personId, 'assignments'] as const,
+  projectAssignment: (projectId: string) => ['projects', projectId, 'my-assignment'] as const,
+  projectUsage: (projectId: string) => ['projects', projectId, 'usage'] as const,
 }
 
 // ─── People ───────────────────────────────────────────────────────────────────
@@ -250,14 +255,94 @@ export function useJoinProject(personId?: string) {
       api
         .post<{ data: ProjectAssignment }>(`/projects/${projectId}/join`, input)
         .then((r) => r.data),
-    onSuccess: () => {
-      // Refresh the user's assignments so the "Participando" badge appears immediately
+    onSuccess: (_data, vars) => {
       if (personId) {
         void qc.invalidateQueries({ queryKey: KEYS.personAssignments(personId) })
       } else {
         void qc.invalidateQueries({ queryKey: KEYS.people })
       }
-      // Refresh budgets so the joined project appears in BudgetDashboard
+      void qc.invalidateQueries({ queryKey: KEYS.projectAssignment(vars.projectId) })
+      void qc.invalidateQueries({ queryKey: ['budgets'] })
+    },
+  })
+}
+
+// ─── Project detail: my assignment + leave ───────────────────────────────────
+
+export function useMyProjectAssignment(projectId: string) {
+  return useQuery({
+    queryKey: KEYS.projectAssignment(projectId),
+    queryFn: () =>
+      api
+        .get<{ data: ProjectAssignment | null }>(`/projects/${projectId}/my-assignment`)
+        .then((r) => r.data),
+    enabled: Boolean(projectId),
+  })
+}
+
+export function useLeaveProject(personId?: string) {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: (projectId: string) =>
+      api.post<{ message: string }>(`/projects/${projectId}/leave`, {}).then((r) => r),
+    onSuccess: (_data, projectId) => {
+      void qc.invalidateQueries({ queryKey: KEYS.projectAssignment(projectId) })
+      if (personId) {
+        void qc.invalidateQueries({ queryKey: KEYS.personAssignments(personId) })
+      }
+      void qc.invalidateQueries({ queryKey: ['budgets'] })
+    },
+  })
+}
+
+// ─── Project detail: AI usage entries ────────────────────────────────────────
+
+export function useProjectUsage(projectId: string) {
+  return useQuery({
+    queryKey: KEYS.projectUsage(projectId),
+    queryFn: () =>
+      api
+        .get<{ data: ProjectUsageEntry[] }>(`/projects/${projectId}/usage`)
+        .then((r) => r.data),
+    enabled: Boolean(projectId),
+  })
+}
+
+export function useAddProjectUsage() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: ({ projectId, ...body }: AddProjectUsageInput) =>
+      api
+        .post<{ data: ProjectUsageEntry }>(`/projects/${projectId}/usage`, body)
+        .then((r) => r.data),
+    onSuccess: (_data, vars) => {
+      void qc.invalidateQueries({ queryKey: KEYS.projectUsage(vars.projectId) })
+      void qc.invalidateQueries({ queryKey: ['budgets'] })
+    },
+  })
+}
+
+export function useUpdateProjectUsage() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: ({ projectId, usageId, hours }: UpdateProjectUsageInput) =>
+      api
+        .patch<{ data: ProjectUsageEntry }>(`/projects/${projectId}/usage/${usageId}`, { hours })
+        .then((r) => r.data),
+    onSuccess: (_data, vars) => {
+      void qc.invalidateQueries({ queryKey: KEYS.projectUsage(vars.projectId) })
+      void qc.invalidateQueries({ queryKey: ['budgets'] })
+    },
+  })
+}
+
+export function useDeleteProjectUsage() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: ({ projectId, usageId }: { projectId: string; usageId: string }) =>
+      api.delete<{ message: string }>(`/projects/${projectId}/usage/${usageId}`),
+    onSuccess: (_data, vars) => {
+      void qc.invalidateQueries({ queryKey: KEYS.projectUsage(vars.projectId) })
       void qc.invalidateQueries({ queryKey: ['budgets'] })
     },
   })

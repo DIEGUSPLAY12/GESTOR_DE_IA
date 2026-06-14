@@ -11,6 +11,7 @@ const LoginPage = lazy(() => import('./routes/LoginPage.js'))
 const RegisterPage = lazy(() => import('./routes/RegisterPage.js'))
 const UserDashboard = lazy(() => import('./routes/UserDashboard.js'))
 const ProfilePage = lazy(() => import('./routes/ProfilePage.js'))
+const ProjectDetailPage = lazy(() => import('./routes/ProjectDetailPage.js'))
 
 function LoadingFallback() {
   return (
@@ -177,6 +178,7 @@ export default function App() {
             <Route path="/consultant" element={<ConsultantPage />} />
             <Route path="/reports" element={<ReportsPage />} />
             <Route path="/dashboard" element={<UserDashboard />} />
+            <Route path="/projects/:projectId" element={<ProjectDetailPage />} />
             <Route path="/profile" element={<ProfilePage />} />
           </Route>
         </Route>

@@ -7,13 +7,18 @@ import type { AuthenticatedRequest } from '../../middleware/auth.js'
 const PERIOD_RE = /^\d{4}-(0[1-9]|1[0-2])$/
 
 export interface ConsultantCostView {
+  id: string
+  project_id: string | null
+  project_name: string
+  project_code: string
   account_name: string
   provider_name: string
-  period_month: string
-  allocated_cost: string
+  plan_name: string
+  units_used: number
+  unit_label: string
+  calculated_cost: string
   currency: string
-  ownership_pct: string
-  calculation_trace: string
+  period_month: string
 }
 
 const router = Router()
@@ -69,56 +74,60 @@ router.get(
         return
       }
 
-      // Fetch imputation results with account + provider context
-      const { data: results, error } = await supabase
-        .from('imputation_result')
-        .select(
-          `
-          account_id,
-          allocated_cost,
+      // Fetch usage_log entries for this person (optionally filtered by period)
+      let query = supabase
+        .from('usage_log')
+        .select(`
+          id,
+          project_id,
+          units_used,
+          unit_label,
+          calculated_cost,
           currency,
           period_month,
-          calculation_trace,
           account:account_id (
             external_identifier,
             pricing_plan:pricing_plan_id (
+              name,
               provider:provider_id ( name )
             )
+          ),
+          project:project_id (
+            code,
+            name
           )
-        `,
-        )
+        `)
         .eq('person_id', personId)
-        .eq('period_month', periodMonth)
-        .order('allocated_cost', { ascending: false })
+        .order('period_month', { ascending: false })
+
+      if (periodMonth !== 'all') {
+        query = query.eq('period_month', periodMonth)
+      }
+
+      const { data: results, error } = await query
 
       if (error) throw new Error(error.message)
 
-      // Fetch ownership percentages for this person separately
-      const { data: ownerships } = await supabase
-        .from('account_ownership')
-        .select('account_id, percentage')
-        .eq('person_id', personId)
-
-      const ownershipMap = new Map<string, string>()
-      for (const o of ownerships ?? []) {
-        ownershipMap.set(o.account_id as string, String(o.percentage))
-      }
+      type AccountJoin = { external_identifier: string; pricing_plan: { name: string; provider: { name: string } | null } | null } | null
+      type ProjectJoin = { code: string; name: string } | null
 
       const costs: ConsultantCostView[] = (results ?? []).map((r) => {
-        const account = (r.account as unknown) as {
-          external_identifier: string
-          pricing_plan: { provider: { name: string } }
-        } | null
-        const accountId = r.account_id as string
+        const account = (r.account as unknown) as AccountJoin
+        const project = (r.project as unknown) as ProjectJoin
 
         return {
-          account_name: account?.external_identifier ?? 'Unknown',
-          provider_name: account?.pricing_plan?.provider?.name ?? 'Unknown',
-          period_month: r.period_month as string,
-          allocated_cost: String(r.allocated_cost),
+          id: r.id as string,
+          project_id: r.project_id as string | null,
+          project_name: project?.name ?? 'Sin proyecto',
+          project_code: project?.code ?? '—',
+          account_name: account?.external_identifier ?? '—',
+          provider_name: account?.pricing_plan?.provider?.name ?? '—',
+          plan_name: account?.pricing_plan?.name ?? '—',
+          units_used: Number(r.units_used),
+          unit_label: r.unit_label as string,
+          calculated_cost: String(r.calculated_cost),
           currency: r.currency as string,
-          ownership_pct: ownershipMap.get(accountId) ?? '0',
-          calculation_trace: r.calculation_trace as string,
+          period_month: r.period_month as string,
         }
       })
 

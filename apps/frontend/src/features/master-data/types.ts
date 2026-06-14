@@ -161,3 +161,35 @@ export interface CreatePlanInput {
 export interface DeleteAccountInput {
   id: string
 }
+
+export interface ProjectUsageEntry {
+  id: string
+  units_used: number
+  unit_label: string
+  calculated_cost: string
+  currency: string
+  period_month: string
+  notes: string | null
+  created_at: string
+  account: {
+    external_identifier: string
+    pricing_plan: {
+      name: string
+      unit_price: string
+      provider: { name: string } | null
+    } | null
+  } | null
+}
+
+export interface AddProjectUsageInput {
+  projectId: string
+  account_id: string
+  hours: number
+  period_month: string
+}
+
+export interface UpdateProjectUsageInput {
+  projectId: string
+  usageId: string
+  hours: number
+}
