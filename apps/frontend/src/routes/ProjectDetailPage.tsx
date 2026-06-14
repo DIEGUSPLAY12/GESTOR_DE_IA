@@ -318,9 +318,13 @@ export default function ProjectDetailPage() {
       <button
         type="button"
         onClick={() => navigate('/dashboard')}
-        className="flex items-center gap-1 text-sm text-alten-mid hover:text-alten-body"
+        className="back-btn"
+        style={{ marginBottom: 4 }}
       >
-        ← Volver a mis proyectos
+        <svg style={{ width: 14, height: 14, flexShrink: 0 }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5} aria-hidden="true">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
+        </svg>
+        Volver a mis proyectos
       </button>
 
       {/* Project info */}

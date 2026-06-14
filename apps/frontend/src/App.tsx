@@ -105,10 +105,10 @@ function Header() {
       {/* Logo */}
       <div className="flex items-center gap-3">
         {/* Replace with: <img src="/alten-logo-white.svg" alt="ALTEN" className="h-7 w-auto" /> */}
-        <svg viewBox="0 0 100 30" className="h-7 w-auto" fill="none" aria-label="ALTEN">
-          <text x="0" y="24" fontFamily="'Inter','Segoe UI',Arial,sans-serif" fontSize="26" fontWeight="700" fill="#FFFFFF" letterSpacing="3">ALTEN</text>
+        <svg viewBox="0 0 118 30" className="h-6 w-auto" fill="none" aria-label="ALTEN">
+          <text x="0" y="24" fontFamily="'Inter','Segoe UI',Arial,sans-serif" fontSize="26" fontWeight="800" fill="#FFFFFF" letterSpacing="1">ALTEN</text>
         </svg>
-        <span className="hidden md:block text-[11px] font-medium text-white/50 tracking-[0.2em] uppercase mt-0.5">
+        <span className="hidden md:block text-[11px] font-medium tracking-[1.5px] uppercase mt-0.5" style={{ color: 'rgba(255,255,255,0.65)' }}>
           España
         </span>
       </div>
@@ -124,12 +124,12 @@ function Header() {
         >
           {/* Avatar con iniciales */}
           <span
-            className="flex items-center justify-center w-8 h-8 rounded-full text-xs font-bold text-white flex-shrink-0"
-            style={{ backgroundColor: '#008BD2' }}
+            className="flex items-center justify-center rounded-full flex-shrink-0 font-bold text-white"
+            style={{ width: 36, height: 36, fontSize: 13, backgroundColor: '#008BD2' }}
           >
             {initials}
           </span>
-          <span className="hidden sm:block max-w-[180px] truncate font-medium">{displayName}</span>
+          <span className="hidden sm:block max-w-[180px] truncate" style={{ fontSize: 14, fontWeight: 500, color: '#FFFFFF' }}>{displayName}</span>
           <svg className="h-3.5 w-3.5 flex-shrink-0 text-white/50" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
             <path fillRule="evenodd" d="M5.22 8.22a.75.75 0 0 1 1.06 0L10 11.94l3.72-3.72a.75.75 0 1 1 1.06 1.06l-4.25 4.25a.75.75 0 0 1-1.06 0L5.22 9.28a.75.75 0 0 1 0-1.06Z" clipRule="evenodd" />
           </svg>
@@ -185,38 +185,47 @@ function Sidebar({ isAdmin, hasPerson }: SidebarProps) {
       style={{ top: 64, width: 240 }}
       aria-label="Navegación principal"
     >
-      <nav className="flex-1 px-3 py-4 space-y-0.5">
-        {showAdmin && (
-          <NavLink to="/master-data" className={itemClass}>
-            {icons.masterData}
-            <span>Datos maestros</span>
+      <nav className="flex-1 px-3 py-5">
+        {/* Label de sección */}
+        <p className="px-5 mb-2" style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.8px', textTransform: 'uppercase', color: 'rgba(255,255,255,0.4)' }}>
+          Navegación
+        </p>
+
+        <div className="space-y-1">
+          {showAdmin && (
+            <NavLink to="/master-data" className={itemClass}>
+              {icons.masterData}
+              <span>Datos maestros</span>
+            </NavLink>
+          )}
+          <NavLink to="/budgets" className={itemClass}>
+            {icons.budgets}
+            <span>Presupuestos</span>
           </NavLink>
-        )}
-        <NavLink to="/budgets" className={itemClass}>
-          {icons.budgets}
-          <span>Presupuestos</span>
-        </NavLink>
-        <NavLink to="/consultant" className={itemClass}>
-          {icons.consumption}
-          <span>Mi consumo</span>
-        </NavLink>
-        {showAdmin && (
-          <NavLink to="/reports" className={itemClass}>
-            {icons.reports}
-            <span>Informes</span>
-          </NavLink>
-        )}
-        {!isAdmin && hasPerson && (
-          <NavLink to="/dashboard" className={itemClass}>
-            {icons.myArea}
-            <span>Mi área</span>
-          </NavLink>
-        )}
+          {!isAdmin && (
+            <NavLink to="/consultant" className={itemClass}>
+              {icons.consumption}
+              <span>Mi consumo</span>
+            </NavLink>
+          )}
+          {showAdmin && (
+            <NavLink to="/reports" className={itemClass}>
+              {icons.reports}
+              <span>Informes</span>
+            </NavLink>
+          )}
+          {!isAdmin && hasPerson && (
+            <NavLink to="/dashboard" className={itemClass}>
+              {icons.myArea}
+              <span>Mi área</span>
+            </NavLink>
+          )}
+        </div>
       </nav>
 
       {/* Footer del sidebar */}
-      <div className="px-4 py-4 border-t border-white/10">
-        <p className="text-[11px] text-white/30 tracking-wide uppercase">
+      <div className="px-5 py-4 border-t border-white/10">
+        <p style={{ fontSize: 11, fontWeight: 500, color: 'rgba(255,255,255,0.45)', letterSpacing: '0.3px' }}>
           Gestor de IA — ALTEN España
         </p>
       </div>

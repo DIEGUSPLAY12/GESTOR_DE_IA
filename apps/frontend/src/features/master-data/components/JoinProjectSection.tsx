@@ -3,17 +3,45 @@ import { useNavigate } from 'react-router-dom'
 import { useProjects, usePersonAssignments, useJoinProject } from '../api/hooks.js'
 import type { Project } from '../types.js'
 
+// ─── Utilidades de fecha ──────────────────────────────────────────────────────
+
+const MONTHS_ES = ['ene.','feb.','mar.','abr.','may.','jun.','jul.','ago.','sep.','oct.','nov.','dic.']
+
+function formatDateEU(iso: string): string {
+  const parts = iso.split('-')
+  const y = parts[0] ?? ''
+  const m = parseInt(parts[1] ?? '1', 10)
+  const d = parseInt(parts[2] ?? '1', 10)
+  return `${d} ${MONTHS_ES[m - 1] ?? ''} ${y}`
+}
+
+function daysRemaining(endDateIso: string): number {
+  const end = new Date(`${endDateIso}T00:00:00`)
+  const now = new Date()
+  now.setHours(0, 0, 0, 0)
+  return Math.ceil((end.getTime() - now.getTime()) / 86400000)
+}
+
+function formatProjectName(raw: string): string {
+  return raw.replace(/_/g, ' ')
+}
+
 // ─── Icono estado vacío ───────────────────────────────────────────────────────
 
 function EmptyProjectsIcon() {
   return (
-    <svg className="mx-auto h-12 w-12 text-alten-border mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.25} aria-hidden="true">
+    <svg
+      className="mx-auto mb-4"
+      style={{ width: 48, height: 48, color: '#C0C0C8' }}
+      fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.25}
+      aria-hidden="true"
+    >
       <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 12.75V12A2.25 2.25 0 0 1 4.5 9.75h15A2.25 2.25 0 0 1 21.75 12v.75m-8.69-6.44-2.12-2.12a1.5 1.5 0 0 0-1.061-.44H4.5A2.25 2.25 0 0 0 2.25 6v8.25m19.5 0v.75A2.25 2.25 0 0 1 19.5 17.25h-15A2.25 2.25 0 0 1 2.25 15.75V15m19.5 0-3-3m0 0-3 3m3-3v12" />
     </svg>
   )
 }
 
-// ─── Formulario de unirse a proyecto ─────────────────────────────────────────
+// ─── Formulario de incorporación ──────────────────────────────────────────────
 
 interface JoinFormProps {
   project: Project
@@ -41,22 +69,22 @@ function JoinForm({ project, personId, onSuccess, onCancel }: JoinFormProps) {
         ...(validTo ? { valid_to: validTo } : {}),
       })
       onSuccess()
-    } catch (err) {
+    } catch {
       setError('No se ha podido completar la operación. Inténtelo de nuevo o contacte con soporte técnico.')
     }
   }
 
   return (
-    <form onSubmit={handleSubmit} noValidate className="mt-4 pt-4 border-t border-alten-border space-y-4">
-      {error && (
-        <div role="alert" className="alert-error">{error}</div>
-      )}
+    <form onSubmit={handleSubmit} noValidate className="mt-5 pt-5 border-t border-alten-border" style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+      {error && <div role="alert" className="alert-error">{error}</div>}
+
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <label className="block text-[13px] font-medium text-alten-body mb-1">
-            Fecha de incorporación <span aria-hidden="true" className="text-alten-red">*</span>
+          <label htmlFor={`from-${project.id}`} className="type-form-label block mb-1.5">
+            Fecha de incorporación <span aria-hidden="true" style={{ color: '#E30513' }}>*</span>
           </label>
           <input
+            id={`from-${project.id}`}
             type="date"
             required
             min={minStart}
@@ -65,15 +93,17 @@ function JoinForm({ project, personId, onSuccess, onCancel }: JoinFormProps) {
             onChange={(e) => { setValidFrom(e.target.value); setValidTo('') }}
             className="field-input"
           />
-          <p className="mt-1 text-caption">
-            Rango permitido: {minStart}{maxEnd ? ` — ${maxEnd}` : ' en adelante'}
+          <p className="type-body-sm mt-1">
+            Rango: {formatDateEU(minStart)}{maxEnd ? ` — ${formatDateEU(maxEnd)}` : ' en adelante'}
           </p>
         </div>
         <div>
-          <label className="block text-[13px] font-medium text-alten-body mb-1">
-            Fecha de fin <span className="text-alten-mid font-normal">(opcional)</span>
+          <label htmlFor={`to-${project.id}`} className="type-form-label block mb-1.5">
+            Fecha de fin{' '}
+            <span style={{ fontWeight: 400, textTransform: 'none', letterSpacing: 0, color: '#8C8C9A', fontSize: 12 }}>(opcional)</span>
           </label>
           <input
+            id={`to-${project.id}`}
             type="date"
             min={validFrom || minStart}
             {...(maxEnd ? { max: maxEnd } : {})}
@@ -83,19 +113,16 @@ function JoinForm({ project, personId, onSuccess, onCancel }: JoinFormProps) {
           />
         </div>
       </div>
-      <div className="flex gap-2">
+
+      <div className="flex gap-3">
         <button
           type="submit"
           disabled={!validFrom || joinProject.isPending}
-          className="btn-primary text-xs px-4 py-2"
+          className="btn-primary btn-sm"
         >
           {joinProject.isPending ? 'Procesando…' : 'Confirmar incorporación'}
         </button>
-        <button
-          type="button"
-          onClick={onCancel}
-          className="btn-secondary text-xs px-4 py-2"
-        >
+        <button type="button" onClick={onCancel} className="btn-secondary btn-sm">
           Cancelar
         </button>
       </div>
@@ -115,18 +142,18 @@ export function JoinProjectSection({ personId }: JoinProjectSectionProps) {
   const { data: myAssignments } = usePersonAssignments(personId)
   const [joiningProjectId, setJoiningProjectId] = useState<string | null>(null)
 
-  const today = new Date().toISOString().slice(0, 10)
+  const todayISO = new Date().toISOString().slice(0, 10)
   const activeProjects = (projects ?? []).filter((p) => p.deleted_at === null)
 
   const joinedProjectIds = new Set(
     (myAssignments ?? [])
-      .filter((a) => a.valid_to === null || a.valid_to >= today)
+      .filter((a) => a.valid_to === null || a.valid_to >= todayISO)
       .map((a) => a.project_id),
   )
 
   if (isLoading) {
     return (
-      <div role="status" className="flex items-center gap-2 py-6 text-[14px] text-alten-mid">
+      <div role="status" className="flex items-center gap-2 py-6" style={{ fontSize: 14, color: '#8C8C9A' }}>
         <svg className="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none" aria-hidden="true">
           <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
           <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 0 1 8-8V0C5.373 0 0 5.373 0 12h4z" />
@@ -138,57 +165,71 @@ export function JoinProjectSection({ personId }: JoinProjectSectionProps) {
 
   if (activeProjects.length === 0) {
     return (
-      <div className="py-12 text-center">
+      <div style={{ padding: '48px 0', textAlign: 'center' }}>
         <EmptyProjectsIcon />
-        <p className="text-[15px] font-medium text-alten-body mb-1">
+        <p style={{ fontSize: 15, fontWeight: 500, color: '#484848', marginBottom: 8 }}>
           No hay proyectos disponibles en este momento
         </p>
-        <p className="text-caption max-w-sm mx-auto">
-          Contacte con el administrador si necesita acceso a un proyecto o si considera que esto es un error.
+        <p style={{ fontSize: 13, color: '#8C8C9A', maxWidth: 360, margin: '0 auto' }}>
+          Contacte con el administrador si necesita acceso a un proyecto
+          o si considera que esto es un error.
         </p>
       </div>
     )
   }
 
   return (
-    <div className="space-y-3">
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
       {activeProjects.map((project) => {
-        const isJoined     = joinedProjectIds.has(project.id)
-        const isExpanding  = joiningProjectId === project.id
+        const isJoined    = joinedProjectIds.has(project.id)
+        const isExpanding = joiningProjectId === project.id
+        const remaining   = project.end_date ? daysRemaining(project.end_date) : null
+        const displayName = formatProjectName(project.name)
 
         return (
-          <div key={project.id} className="project-card p-5">
+          <div key={project.id} className="project-card">
             <div className="flex items-start justify-between gap-4">
-              <div className="min-w-0 flex-1">
+              {/* Info del proyecto */}
+              <div style={{ minWidth: 0, flex: 1 }}>
                 {/* Código + nombre */}
-                <div className="flex items-center gap-2 flex-wrap mb-1">
+                <div className="flex items-center flex-wrap" style={{ gap: 8, marginBottom: 6 }}>
                   <span className="badge-code">{project.code}</span>
-                  <span className="text-[16px] font-semibold text-alten-dark leading-tight">
-                    {project.name}
-                  </span>
+                  <span className="type-card-title">{displayName}</span>
                 </div>
+
                 {/* Empresa y fechas */}
-                <p className="text-caption">
+                <p style={{ fontSize: 13, color: '#8C8C9A', marginBottom: remaining !== null ? 4 : 0 }}>
                   {project.client_name}
-                  <span className="mx-1.5 text-alten-border">·</span>
-                  {project.start_date}
-                  {project.end_date ? ` — ${project.end_date}` : ' — (abierto)'}
+                  <span style={{ margin: '0 8px', color: '#D1D5DB' }}>·</span>
+                  {formatDateEU(project.start_date)}
+                  {project.end_date ? ` → ${formatDateEU(project.end_date)}` : ' → (abierto)'}
                 </p>
+
+                {/* Días restantes */}
+                {remaining !== null && (
+                  <p style={{ fontSize: 12, fontWeight: 500, color: remaining > 0 ? '#008BD2' : '#E30513' }}>
+                    {remaining > 0
+                      ? `${remaining} días restantes`
+                      : remaining === 0
+                      ? 'Finaliza hoy'
+                      : `Finalizado hace ${Math.abs(remaining)} días`}
+                  </p>
+                )}
               </div>
 
               {/* Acciones */}
-              <div className="flex-shrink-0 flex items-center gap-2">
+              <div className="flex items-center flex-shrink-0" style={{ gap: 8 }}>
                 {isJoined ? (
                   <>
                     <span className="badge-active">Participando</span>
                     <button
                       type="button"
                       onClick={() => navigate(`/projects/${project.id}`)}
-                      className="inline-flex items-center gap-1.5 rounded px-3 py-1.5 text-xs font-semibold
-                                 bg-alten-blue text-white hover:bg-alten-dark transition-colors duration-200"
+                      className="btn-primary btn-sm"
+                      style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}
                     >
                       Ver proyecto
-                      <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5} aria-hidden="true">
+                      <svg style={{ width: 12, height: 12 }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5} aria-hidden="true">
                         <path strokeLinecap="round" strokeLinejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
                       </svg>
                     </button>
@@ -197,8 +238,7 @@ export function JoinProjectSection({ personId }: JoinProjectSectionProps) {
                   <button
                     type="button"
                     onClick={() => setJoiningProjectId(isExpanding ? null : project.id)}
-                    className="inline-flex items-center gap-1 rounded px-3 py-1.5 text-xs font-semibold
-                               bg-alten-blue text-white hover:bg-alten-dark transition-colors duration-200"
+                    className="btn-primary btn-sm"
                   >
                     {isExpanding ? 'Cancelar' : '+ Unirse al proyecto'}
                   </button>

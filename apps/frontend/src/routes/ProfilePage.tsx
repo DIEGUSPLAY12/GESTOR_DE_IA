@@ -91,41 +91,53 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="max-w-lg mx-auto">
-      <div className="mb-6 flex items-center gap-3">
-        <button
-          type="button"
-          onClick={() => navigate(-1)}
-          className="text-alten-mid hover:text-alten-body text-sm"
+    <div style={{ maxWidth: 560, margin: '0 auto' }}>
+      {/* Botón de retroceso */}
+      <button
+        type="button"
+        onClick={() => navigate(-1)}
+        className="back-btn"
+        style={{ marginBottom: 20 }}
+      >
+        <svg style={{ width: 14, height: 14, flexShrink: 0 }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5} aria-hidden="true">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
+        </svg>
+        Volver
+      </button>
+
+      <h1 className="type-page-title" style={{ marginBottom: 28 }}>Mi Perfil</h1>
+
+      {/* Sección: Información personal */}
+      <section className="bg-white rounded-lg border border-alten-border" style={{ padding: '24px 28px', marginBottom: 20, boxShadow: '0 1px 4px rgba(0,0,0,0.07)' }}>
+        <h2
+          className="type-section-title"
+          style={{ marginBottom: 16, paddingBottom: 16, borderBottom: '1px solid #E6E6E9' }}
         >
-          ← Volver
-        </button>
-        <h1 className="text-xl font-bold text-alten-body">Mi perfil</h1>
-      </div>
+          Información personal
+        </h2>
 
-      {/* Personal info section */}
-      <section className="bg-white rounded-lg border border-alten-border p-6 mb-4">
-        <h2 className="text-base font-semibold text-alten-body mb-4">Información personal</h2>
-
-        <div className="mb-4">
-          <p className="text-xs text-alten-mid uppercase tracking-wide mb-0.5">Correo electrónico</p>
-          <p className="text-sm text-alten-body">{user?.email}</p>
+        {/* Correo — solo lectura con más peso */}
+        <div style={{ marginBottom: 20 }}>
+          <p className="type-form-label" style={{ marginBottom: 6 }}>Correo electrónico</p>
+          <p style={{ fontSize: 15, fontWeight: 500, color: '#043962' }}>
+            {user?.email?.toLowerCase()}
+          </p>
         </div>
 
         {nameSuccess && (
-          <div role="status" className="mb-3 rounded border border-alten-mid-blue bg-green-50 px-3 py-2 text-sm text-alten-dark">
+          <div role="status" className="alert-success" style={{ marginBottom: 16 }}>
             Nombre actualizado correctamente.
           </div>
         )}
         {nameError && (
-          <div role="alert" className="mb-3 rounded border border-alten-red/30 bg-red-50 px-3 py-2 text-sm text-alten-red">
+          <div role="alert" className="alert-error" style={{ marginBottom: 16 }}>
             {nameError}
           </div>
         )}
 
-        <form onSubmit={handleNameSubmit} noValidate className="space-y-3">
+        <form onSubmit={handleNameSubmit} noValidate style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
           <div>
-            <label htmlFor="profile-name" className="block text-sm font-medium text-alten-body mb-1">
+            <label htmlFor="profile-name" className="type-form-label block" style={{ marginBottom: 6 }}>
               Nombre completo
             </label>
             <input
@@ -133,39 +145,46 @@ export default function ProfilePage() {
               type="text"
               autoComplete="name"
               required
-              className="block w-full rounded border border-alten-border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-alten-blue"
+              className="field-input"
               value={fullName}
               onChange={(e) => { setFullName(e.target.value); setNameSuccess(false) }}
             />
           </div>
-          <button
-            type="submit"
-            disabled={nameSaving || !fullName.trim() || !person}
-            className="rounded bg-alten-blue px-4 py-2 text-sm font-semibold text-white hover:bg-alten-hover disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {nameSaving ? 'Guardando…' : 'Guardar nombre'}
-          </button>
+          <div>
+            <button
+              type="submit"
+              disabled={nameSaving || !fullName.trim() || !person}
+              className="btn-primary"
+            >
+              {nameSaving ? 'Guardando…' : 'Guardar nombre'}
+            </button>
+          </div>
         </form>
       </section>
 
-      {/* Password section */}
-      <section className="bg-white rounded-lg border border-alten-border p-6">
-        <h2 className="text-base font-semibold text-alten-body mb-4">Cambiar contraseña</h2>
+      {/* Sección: Cambiar contraseña */}
+      <section className="bg-white rounded-lg border border-alten-border" style={{ padding: '24px 28px', boxShadow: '0 1px 4px rgba(0,0,0,0.07)' }}>
+        <h2
+          className="type-section-title"
+          style={{ marginBottom: 16, paddingBottom: 16, borderBottom: '1px solid #E6E6E9' }}
+        >
+          Cambiar contraseña
+        </h2>
 
         {passwordSuccess && (
-          <div role="status" className="mb-3 rounded border border-alten-mid-blue bg-green-50 px-3 py-2 text-sm text-alten-dark">
+          <div role="status" className="alert-success" style={{ marginBottom: 16 }}>
             Contraseña actualizada correctamente.
           </div>
         )}
         {passwordError && (
-          <div role="alert" className="mb-3 rounded border border-alten-red/30 bg-red-50 px-3 py-2 text-sm text-alten-red">
+          <div role="alert" className="alert-error" style={{ marginBottom: 16 }}>
             {passwordError}
           </div>
         )}
 
-        <form onSubmit={handlePasswordSubmit} noValidate className="space-y-3">
+        <form onSubmit={handlePasswordSubmit} noValidate style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
           <div>
-            <label htmlFor="current-password" className="block text-sm font-medium text-alten-body mb-1">
+            <label htmlFor="current-password" className="type-form-label block" style={{ marginBottom: 6 }}>
               Contraseña actual
             </label>
             <input
@@ -173,13 +192,13 @@ export default function ProfilePage() {
               type="password"
               autoComplete="current-password"
               required
-              className="block w-full rounded border border-alten-border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-alten-blue"
+              className="field-input"
               value={currentPassword}
               onChange={(e) => { setCurrentPassword(e.target.value); setPasswordSuccess(false) }}
             />
           </div>
           <div>
-            <label htmlFor="new-password" className="block text-sm font-medium text-alten-body mb-1">
+            <label htmlFor="new-password" className="type-form-label block" style={{ marginBottom: 6 }}>
               Nueva contraseña
             </label>
             <input
@@ -188,13 +207,13 @@ export default function ProfilePage() {
               autoComplete="new-password"
               required
               minLength={6}
-              className="block w-full rounded border border-alten-border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-alten-blue"
+              className="field-input"
               value={newPassword}
               onChange={(e) => { setNewPassword(e.target.value); setPasswordSuccess(false) }}
             />
           </div>
           <div>
-            <label htmlFor="confirm-password" className="block text-sm font-medium text-alten-body mb-1">
+            <label htmlFor="confirm-password" className="type-form-label block" style={{ marginBottom: 6 }}>
               Confirmar nueva contraseña
             </label>
             <input
@@ -203,18 +222,20 @@ export default function ProfilePage() {
               autoComplete="new-password"
               required
               minLength={6}
-              className="block w-full rounded border border-alten-border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-alten-blue"
+              className="field-input"
               value={confirmPassword}
               onChange={(e) => { setConfirmPassword(e.target.value); setPasswordSuccess(false) }}
             />
           </div>
-          <button
-            type="submit"
-            disabled={passwordSaving || !currentPassword || !newPassword || !confirmPassword}
-            className="rounded bg-alten-blue px-4 py-2 text-sm font-semibold text-white hover:bg-alten-hover disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {passwordSaving ? 'Guardando…' : 'Cambiar contraseña'}
-          </button>
+          <div>
+            <button
+              type="submit"
+              disabled={passwordSaving || !currentPassword || !newPassword || !confirmPassword}
+              className="btn-primary"
+            >
+              {passwordSaving ? 'Guardando…' : 'Cambiar contraseña'}
+            </button>
+          </div>
         </form>
       </section>
     </div>

@@ -6,17 +6,18 @@ export interface ReportFilters {
   personId?: string
 }
 
-interface ImputationRow {
+interface UsageLogRow {
   id: string
   period_month: string
   project_id: string | null
   person_id: string
   account_id: string
-  allocated_cost: string
+  units_used: number
+  unit_label: string | null
+  calculated_cost: string
   currency: string
-  audit_hash: string
-  calculated_at: string
-  calculation_trace: string
+  notes: string | null
+  created_at: string
   person?: { full_name: string; email: string } | null
   project?: { code: string; name: string } | null
   account?: {
@@ -47,16 +48,17 @@ const CSV_HEADERS = [
   'account_identifier',
   'provider_name',
   'plan_name',
-  'allocated_cost',
+  'units_used',
+  'unit_label',
+  'calculated_cost',
   'currency',
-  'audit_hash',
-  'calculated_at',
-  'calculation_trace',
+  'notes',
+  'created_at',
 ]
 
 export async function exportImputationsCsv(filters: ReportFilters): Promise<string> {
   let query = supabase
-    .from('imputation_result')
+    .from('usage_log')
     .select(
       `
       id,
@@ -64,11 +66,12 @@ export async function exportImputationsCsv(filters: ReportFilters): Promise<stri
       project_id,
       person_id,
       account_id,
-      allocated_cost,
+      units_used,
+      unit_label,
+      calculated_cost,
       currency,
-      audit_hash,
-      calculated_at,
-      calculation_trace,
+      notes,
+      created_at,
       person:person_id ( full_name, email ),
       project:project_id ( code, name ),
       account:account_id (
@@ -81,7 +84,7 @@ export async function exportImputationsCsv(filters: ReportFilters): Promise<stri
     `,
     )
     .order('period_month', { ascending: false })
-    .order('calculated_at', { ascending: false })
+    .order('created_at', { ascending: false })
 
   if (filters.periodMonth) {
     query = query.eq('period_month', filters.periodMonth)
@@ -96,13 +99,12 @@ export async function exportImputationsCsv(filters: ReportFilters): Promise<stri
   const { data, error } = await query
   if (error) throw new Error(`Export query failed: ${error.message}`)
 
-  const rows = (data ?? []) as unknown as ImputationRow[]
+  const rows = (data ?? []) as unknown as UsageLogRow[]
 
   const lines: string[] = [CSV_HEADERS.join(',')]
 
   for (const r of rows) {
-    const providerName =
-      (r.account?.pricing_plan?.provider?.name) ?? ''
+    const providerName = r.account?.pricing_plan?.provider?.name ?? ''
     const planName = r.account?.pricing_plan?.name ?? ''
 
     lines.push(
@@ -116,11 +118,12 @@ export async function exportImputationsCsv(filters: ReportFilters): Promise<stri
         csvCell(r.account?.external_identifier),
         csvCell(providerName),
         csvCell(planName),
-        csvCell(r.allocated_cost),
+        csvCell(String(r.units_used)),
+        csvCell(r.unit_label),
+        csvCell(r.calculated_cost),
         csvCell(r.currency),
-        csvCell(r.audit_hash),
-        csvCell(r.calculated_at),
-        csvCell(r.calculation_trace),
+        csvCell(r.notes),
+        csvCell(r.created_at),
       ].join(','),
     )
   }

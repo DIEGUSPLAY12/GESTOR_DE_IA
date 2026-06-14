@@ -7,12 +7,15 @@ import { useCurrentUser } from '../lib/useCurrentUser.js'
 type Tab = 'proyectos' | 'herramientas' | 'historial'
 
 function formatDateFormal(date: Date): string {
-  return date.toLocaleDateString('es-ES', {
+  const raw = date.toLocaleDateString('es-ES', {
     weekday: 'long',
     year: 'numeric',
     month: 'long',
     day: 'numeric',
   })
+  // Capitalizar solo la primera letra; el resto en minúsculas
+  // Corrije comportamientos de navegador como "Domingo, 14 De Junio De 2026"
+  return raw.charAt(0).toUpperCase() + raw.slice(1).toLowerCase()
 }
 
 export default function UserDashboard() {
@@ -29,19 +32,37 @@ export default function UserDashboard() {
       {/* Cabecera de sección */}
       <div className="page-header">
         <div>
-          <h1 className="text-2xl font-bold text-alten-dark">Mi Área de Trabajo</h1>
-          <p className="text-[14px] text-alten-mid mt-1">
-            Bienvenido/a, <span className="font-medium text-alten-body">{person?.full_name ?? '—'}</span>
-            {' '}— ALTEN España
-          </p>
+          {/* Saludo con nombre destacado */}
+          <div className="flex items-center gap-2 mb-2">
+            <div
+              className="flex items-center justify-center rounded-full flex-shrink-0"
+              style={{ width: 40, height: 40, background: '#008BD2', fontSize: 14, fontWeight: 700, color: '#fff' }}
+            >
+              {person?.full_name
+                ? person.full_name.split(' ').slice(0, 2).map((n) => n[0]).join('').toUpperCase()
+                : '?'}
+            </div>
+            <div>
+              <p style={{ fontSize: 13, color: '#8C8C9A', lineHeight: 1.3 }}>Bienvenido,</p>
+              <p style={{ fontSize: 17, fontWeight: 700, color: '#043962', lineHeight: 1.3 }}>
+                {person?.full_name ?? '—'}
+              </p>
+            </div>
+          </div>
+          <h1 className="type-page-title">Mi Área de Trabajo</h1>
         </div>
-        <p className="text-[13px] text-alten-mid text-right capitalize hidden sm:block mt-1">
-          {formatDateFormal(new Date())}
-        </p>
+        <div className="hidden sm:flex flex-col items-end gap-1" style={{ marginTop: 4 }}>
+          <span style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.8px', color: '#008BD2', textTransform: 'uppercase' }}>
+            ALTEN España
+          </span>
+          <span style={{ fontSize: 13, color: '#8C8C9A' }}>
+            {formatDateFormal(new Date())}
+          </span>
+        </div>
       </div>
 
       {/* Tabs */}
-      <div role="tablist" aria-label="Secciones de mi área" className="flex gap-0.5 border-b border-alten-border mb-6">
+      <div role="tablist" aria-label="Secciones de mi área" className="flex border-b border-alten-border mb-6" style={{ gap: 4 }}>
         <button
           role="tab"
           aria-selected={activeTab === 'proyectos'}
@@ -73,19 +94,19 @@ export default function UserDashboard() {
 
       {/* Panel: Proyectos */}
       <div role="tabpanel" id="panel-proyectos" hidden={activeTab !== 'proyectos'}>
-        <p className="text-[14px] text-alten-mid mb-5">
-          Proyectos en los que participa su cuenta. Puede registrar el uso de herramientas de IA
-          en cada proyecto activo.
+        <p style={{ fontSize: 14, color: '#8C8C9A', marginBottom: 20 }}>
+          Proyectos en los que participa su cuenta. Puede registrar el uso de herramientas
+          de IA en cada proyecto activo.
         </p>
         {person
           ? <JoinProjectSection personId={person.id} />
-          : <p className="text-sm text-alten-mid">Cargando información de proyectos…</p>
+          : <p style={{ fontSize: 14, color: '#8C8C9A' }}>Cargando información de proyectos…</p>
         }
       </div>
 
       {/* Panel: Herramientas */}
       <div role="tabpanel" id="panel-herramientas" hidden={activeTab !== 'herramientas'}>
-        <p className="text-[14px] text-alten-mid mb-5">
+        <p style={{ fontSize: 14, color: '#8C8C9A', marginBottom: 20 }}>
           Gestione las herramientas de IA asociadas a su cuenta. Las herramientas añadidas
           estarán disponibles al registrar uso en proyectos.
         </p>
@@ -94,7 +115,7 @@ export default function UserDashboard() {
 
       {/* Panel: Historial */}
       <div role="tabpanel" id="panel-historial" hidden={activeTab !== 'historial'}>
-        <p className="text-[14px] text-alten-mid mb-5">
+        <p style={{ fontSize: 14, color: '#8C8C9A', marginBottom: 20 }}>
           Registro histórico del uso de herramientas de IA imputado a proyectos.
         </p>
         <UsageHistory periodMonth={periodMonth} />
