@@ -69,11 +69,12 @@ router.get(
         return
       }
 
-      // Fetch imputation results with account/provider/ownership context
+      // Fetch imputation results with account + provider context
       const { data: results, error } = await supabase
         .from('imputation_result')
         .select(
           `
+          account_id,
           allocated_cost,
           currency,
           period_month,
@@ -83,9 +84,6 @@ router.get(
             pricing_plan:pricing_plan_id (
               provider:provider_id ( name )
             )
-          ),
-          ownership:account_id (
-            percentage
           )
         `,
         )
@@ -95,7 +93,7 @@ router.get(
 
       if (error) throw new Error(error.message)
 
-      // Join with account_ownership for this person to get their percentage
+      // Fetch ownership percentages for this person separately
       const { data: ownerships } = await supabase
         .from('account_ownership')
         .select('account_id, percentage')
@@ -111,6 +109,7 @@ router.get(
           external_identifier: string
           pricing_plan: { provider: { name: string } }
         } | null
+        const accountId = r.account_id as string
 
         return {
           account_name: account?.external_identifier ?? 'Unknown',
@@ -118,7 +117,7 @@ router.get(
           period_month: r.period_month as string,
           allocated_cost: String(r.allocated_cost),
           currency: r.currency as string,
-          ownership_pct: ownershipMap.get(String(r['account_id' as keyof typeof r])) ?? '0',
+          ownership_pct: ownershipMap.get(accountId) ?? '0',
           calculation_trace: r.calculation_trace as string,
         }
       })

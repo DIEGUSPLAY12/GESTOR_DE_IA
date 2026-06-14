@@ -48,17 +48,50 @@ router.get('/', requireAuth, async (req: AuthenticatedRequest, res: Response, ne
     }
 
     const isAdmin = req.user?.roles?.includes('ADMIN') ?? false
-    const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
-    const subIsUuid = UUID_RE.test(currentUserId)
 
-    // ADMINs (or dev bypass) see all projects; PMs only see their own
+    // ADMINs see all projects; everyone else sees projects they manage OR are assigned to.
+    // person.id is a DB-generated UUID — it is NOT the same as req.user.sub (auth UUID),
+    // so we always resolve the person row first when scoping is needed.
     let projectQuery = supabase
       .from('project')
       .select('id, name, code, monthly_budget')
       .is('deleted_at', null)
 
-    if (!isAdmin && subIsUuid) {
-      projectQuery = projectQuery.eq('project_manager_id', currentUserId)
+    if (!isAdmin) {
+      const userEmail = req.user?.email ?? ''
+      const { data: personRow } = await supabase
+        .from('person')
+        .select('id')
+        .eq('email', userEmail)
+        .is('deleted_at', null)
+        .maybeSingle()
+
+      const personId = personRow ? (personRow as { id: string }).id : null
+
+      const assignedProjectIds: string[] = []
+      if (personId) {
+        const { data: assignments } = await supabase
+          .from('project_assignment')
+          .select('project_id')
+          .eq('person_id', personId)
+          .is('valid_to', null)
+        assignedProjectIds.push(
+          ...((assignments ?? []).map((a) => (a as { project_id: string }).project_id)),
+        )
+      }
+
+      if (personId && assignedProjectIds.length > 0) {
+        // Show projects they manage (by DB person id) OR are actively assigned to
+        projectQuery = projectQuery.or(
+          `project_manager_id.eq.${personId},id.in.(${assignedProjectIds.join(',')})`,
+        )
+      } else if (personId) {
+        projectQuery = projectQuery.eq('project_manager_id', personId)
+      } else {
+        // Person record not found — return nothing
+        res.json({ data: [] })
+        return
+      }
     }
 
     if (projectId) {

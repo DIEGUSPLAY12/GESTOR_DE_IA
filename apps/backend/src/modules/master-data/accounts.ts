@@ -1,7 +1,20 @@
 import { Router } from 'express'
 import { supabase } from '../../lib/supabase.js'
 import { requireAuth, requireRole } from '../../middleware/auth.js'
+import type { AuthenticatedRequest } from '../../middleware/auth.js'
 import { validateOwnershipSum } from './validators.js'
+
+async function resolvePersonId(req: AuthenticatedRequest): Promise<string | null> {
+  const email = req.user?.email
+  if (!email) return null
+  const { data } = await supabase
+    .from('person')
+    .select('id')
+    .eq('email', email)
+    .is('deleted_at', null)
+    .maybeSingle()
+  return data ? (data as { id: string }).id : null
+}
 
 const DATE_RE = /^\d{4}-(0[1-9]|1[0-2])-([0-2]\d|3[01])$/
 const PLAN_TYPES = ['PER_SEAT', 'POOL_SLOT', 'PAY_PER_TOKEN', 'VOLUME_TIER'] as const
@@ -139,7 +152,7 @@ accountsRouter.get('/', requireAuth, async (req, res, next) => {
 
     let query = supabase
       .from('ai_account')
-      .select('*, pricing_plan:pricing_plan_id(type, name, currency, unit_price)')
+      .select('*, pricing_plan:pricing_plan_id(type, name, currency, unit_price, provider:provider_id(name))')
       .order('valid_from', { ascending: false })
 
     if (!includeDeleted) query = query.is('deleted_at', null)
@@ -293,6 +306,97 @@ accountsRouter.post('/:id/owners', requireAuth, requireRole('ADMIN'), async (req
 
     if (error) throw new Error(error.message)
     res.status(201).json({ data })
+  } catch (err) {
+    next(err)
+  }
+})
+
+// GET /api/v1/accounts/mine
+// Returns all active subscriptions for the current user (account_ownership with valid_to=null)
+accountsRouter.get('/mine', requireAuth, async (req: AuthenticatedRequest, res, next) => {
+  try {
+    const personId = await resolvePersonId(req)
+    if (!personId) { res.json({ data: [] }); return }
+
+    const { data, error } = await supabase
+      .from('account_ownership')
+      .select(`
+        id,
+        account_id,
+        valid_from,
+        account:account_id (
+          id,
+          external_identifier,
+          valid_to,
+          pricing_plan:pricing_plan_id (
+            id, name, type, unit_price, currency,
+            provider:provider_id ( name )
+          )
+        )
+      `)
+      .eq('person_id', personId)
+      .is('valid_to', null)
+      .order('valid_from', { ascending: false })
+
+    if (error) throw new Error(error.message)
+    res.json({ data: data ?? [] })
+  } catch (err) {
+    next(err)
+  }
+})
+
+// POST /api/v1/accounts/:accountId/subscribe
+// Current user adds an AI account to their profile
+accountsRouter.post('/:accountId/subscribe', requireAuth, async (req: AuthenticatedRequest, res, next) => {
+  try {
+    const { accountId } = req.params as { accountId: string }
+    const personId = await resolvePersonId(req)
+    if (!personId) { res.status(403).json({ error: 'No person record found' }); return }
+
+    const { data: existing } = await supabase
+      .from('account_ownership')
+      .select('id')
+      .eq('account_id', accountId)
+      .eq('person_id', personId)
+      .is('valid_to', null)
+      .maybeSingle()
+
+    if (existing) {
+      res.status(409).json({ error: 'Ya tienes esta herramienta en tu perfil' })
+      return
+    }
+
+    const today = new Date().toISOString().slice(0, 10)
+    const { data, error } = await supabase
+      .from('account_ownership')
+      .insert({ account_id: accountId, person_id: personId, percentage: 100, valid_from: today })
+      .select()
+      .single()
+
+    if (error) throw new Error(error.message)
+    res.status(201).json({ data })
+  } catch (err) {
+    next(err)
+  }
+})
+
+// DELETE /api/v1/accounts/:accountId/subscribe
+// Current user removes an AI account from their profile
+accountsRouter.delete('/:accountId/subscribe', requireAuth, async (req: AuthenticatedRequest, res, next) => {
+  try {
+    const { accountId } = req.params as { accountId: string }
+    const personId = await resolvePersonId(req)
+    if (!personId) { res.status(403).json({ error: 'No person record found' }); return }
+
+    const { error } = await supabase
+      .from('account_ownership')
+      .delete()
+      .eq('account_id', accountId)
+      .eq('person_id', personId)
+      .is('valid_to', null)
+
+    if (error) throw new Error(error.message)
+    res.json({ message: 'Herramienta eliminada de tu perfil' })
   } catch (err) {
     next(err)
   }

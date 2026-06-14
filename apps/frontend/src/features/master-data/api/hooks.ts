@@ -11,6 +11,7 @@ import type {
   CreatePlanInput,
   CreateProjectInput,
   CreateProviderInput,
+  MySubscription,
   Person,
   PricingPlan,
   Project,
@@ -28,6 +29,7 @@ export const KEYS = {
   plans: (providerId: string) => ['providers', providerId, 'plans'] as const,
   accounts: ['accounts'] as const,
   accountOwners: (accountId: string) => ['accounts', accountId, 'owners'] as const,
+  myAccounts: ['accounts', 'mine'] as const,
   personAssignments: (personId: string) => ['people', personId, 'assignments'] as const,
 }
 
@@ -200,6 +202,34 @@ export function useAssignOwner() {
   })
 }
 
+// ─── My subscriptions (user's AI tools) ──────────────────────────────────────
+
+export function useMyAccounts() {
+  return useQuery({
+    queryKey: KEYS.myAccounts,
+    queryFn: () =>
+      api.get<{ data: MySubscription[] }>('/accounts/mine').then((r) => r.data),
+  })
+}
+
+export function useSubscribeAccount() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: (accountId: string) =>
+      api.post<{ data: unknown }>(`/accounts/${accountId}/subscribe`, {}).then((r) => r.data),
+    onSuccess: () => { void qc.invalidateQueries({ queryKey: KEYS.myAccounts }) },
+  })
+}
+
+export function useUnsubscribeAccount() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: (accountId: string) =>
+      api.delete<{ message: string }>(`/accounts/${accountId}/subscribe`),
+    onSuccess: () => { void qc.invalidateQueries({ queryKey: KEYS.myAccounts }) },
+  })
+}
+
 // ─── Assign person to project ─────────────────────────────────────────────────
 
 export function usePersonAssignments(personId: string) {
@@ -213,7 +243,7 @@ export function usePersonAssignments(personId: string) {
   })
 }
 
-export function useJoinProject() {
+export function useJoinProject(personId?: string) {
   const qc = useQueryClient()
   return useMutation({
     mutationFn: ({ projectId, ...input }: JoinProjectInput) =>
@@ -221,8 +251,14 @@ export function useJoinProject() {
         .post<{ data: ProjectAssignment }>(`/projects/${projectId}/join`, input)
         .then((r) => r.data),
     onSuccess: () => {
-      // Invalidate all person-assignment queries so UI reflects the new membership
-      qc.invalidateQueries({ queryKey: KEYS.people })
+      // Refresh the user's assignments so the "Participando" badge appears immediately
+      if (personId) {
+        void qc.invalidateQueries({ queryKey: KEYS.personAssignments(personId) })
+      } else {
+        void qc.invalidateQueries({ queryKey: KEYS.people })
+      }
+      // Refresh budgets so the joined project appears in BudgetDashboard
+      void qc.invalidateQueries({ queryKey: ['budgets'] })
     },
   })
 }

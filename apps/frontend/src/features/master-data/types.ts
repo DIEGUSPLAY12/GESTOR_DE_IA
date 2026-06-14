@@ -49,7 +49,28 @@ export interface AiAccount {
   valid_from: string
   valid_to: string | null
   deleted_at: string | null
-  pricing_plan?: Pick<PricingPlan, 'type' | 'name' | 'currency' | 'unit_price'>
+  pricing_plan?: Pick<PricingPlan, 'type' | 'name' | 'currency' | 'unit_price'> & {
+    provider?: { name: string }
+  }
+}
+
+export interface MySubscription {
+  id: string
+  account_id: string
+  valid_from: string
+  account: {
+    id: string
+    external_identifier: string
+    valid_to: string | null
+    pricing_plan: {
+      id: string
+      name: string
+      type: PlanType
+      unit_price: string
+      currency: string
+      provider: { name: string } | null
+    } | null
+  } | null
 }
 
 export interface AccountOwnership {
