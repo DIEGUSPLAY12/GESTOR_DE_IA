@@ -3,18 +3,159 @@
 @tailwind utilities;
 
 @layer base {
-  /* Respect user motion preferences */
+  body {
+    @apply bg-alten-surface text-alten-body;
+    font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+    font-size: 14px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1 { @apply text-2xl font-bold text-alten-dark; }
+  h2 { @apply text-lg font-semibold text-alten-dark; }
+  h3 { @apply text-[15px] font-semibold text-alten-body; }
+
   @media (prefers-reduced-motion: reduce) {
-    *,
-    *::before,
-    *::after {
+    *, *::before, *::after {
       animation-duration: 0.01ms !important;
       transition-duration: 0.01ms !important;
     }
   }
 
-  /* Focus ring — visible for keyboard users, hidden for mouse */
   :focus-visible {
-    @apply outline-2 outline-offset-2 outline-blue-600;
+    outline: 2px solid #008BD2;
+    outline-offset: 2px;
+  }
+}
+
+@layer components {
+  /* ── Tipografía ──────────────────────────────────────────────── */
+  .text-caption { @apply text-[13px] font-normal text-alten-mid; }
+  .text-code    { @apply text-[11px] font-bold font-mono text-alten-dark; }
+
+  /* ── Botón primario ─────────────────────────────────────────── */
+  .btn-primary {
+    @apply inline-flex items-center gap-2 rounded px-4 py-2 text-sm font-semibold
+           bg-alten-blue text-white transition-colors duration-200
+           hover:bg-alten-dark
+           disabled:opacity-50 disabled:cursor-not-allowed
+           focus-visible:outline-none;
+  }
+
+  /* ── Botón secundario / outline ──────────────────────────────── */
+  .btn-secondary {
+    @apply inline-flex items-center gap-2 rounded px-4 py-2 text-sm font-medium
+           border border-alten-blue text-alten-blue bg-transparent transition-colors duration-200
+           hover:bg-alten-pale
+           disabled:opacity-50 disabled:cursor-not-allowed
+           focus-visible:outline-none;
+  }
+
+  /* ── Botón peligro ──────────────────────────────────────────── */
+  .btn-danger {
+    @apply inline-flex items-center gap-2 rounded px-4 py-2 text-sm font-semibold
+           bg-alten-red text-white transition-colors duration-200
+           hover:bg-red-800
+           disabled:opacity-50 disabled:cursor-not-allowed
+           focus-visible:outline-none;
+  }
+
+  /* ── Card corporativa ────────────────────────────────────────── */
+  .card {
+    @apply bg-white rounded-lg border border-alten-border
+           shadow-[0_1px_4px_rgba(0,0,0,0.08)];
+  }
+
+  /* ── Card de proyecto ────────────────────────────────────────── */
+  .project-card {
+    @apply bg-white rounded-lg border border-alten-border border-l-4 border-l-alten-blue
+           shadow-[0_1px_4px_rgba(0,0,0,0.08)] transition-shadow duration-200
+           hover:shadow-[0_4px_12px_rgba(0,0,0,0.12)];
+  }
+
+  /* ── Input base ─────────────────────────────────────────────── */
+  .field-input {
+    @apply block w-full rounded border border-alten-border px-3 py-2 text-sm
+           text-alten-body placeholder:text-alten-mid bg-white
+           transition-colors duration-200
+           focus:outline-none focus:border-alten-blue focus:ring-1 focus:ring-alten-blue;
+  }
+
+  /* ── Select base ─────────────────────────────────────────────── */
+  .field-select {
+    @apply block w-full rounded border border-alten-border px-3 py-2 text-sm
+           text-alten-body bg-white
+           transition-colors duration-200
+           focus:outline-none focus:border-alten-blue focus:ring-1 focus:ring-alten-blue;
+  }
+
+  /* ── Tabla: cabecera ─────────────────────────────────────────── */
+  .th {
+    @apply px-4 py-3 text-left text-xs font-semibold text-white uppercase tracking-wider
+           bg-alten-dark;
+  }
+
+  /* ── Badge estado: Participando ──────────────────────────────── */
+  .badge-active {
+    @apply inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold
+           bg-[#E8F5E9] text-[#2E7D32] border border-[#A5D6A7];
+  }
+
+  /* ── Badge código de proyecto ────────────────────────────────── */
+  .badge-code {
+    @apply inline-block rounded px-1.5 py-0.5 text-[11px] font-bold
+           bg-alten-border text-alten-dark font-mono;
+  }
+
+  /* ── Badge informativo ───────────────────────────────────────── */
+  .badge-info {
+    @apply inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold
+           bg-alten-pale text-alten-dark;
+  }
+
+  /* ── Badge error ─────────────────────────────────────────────── */
+  .badge-error {
+    @apply inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold
+           bg-alten-red text-white;
+  }
+
+  /* ── StatusBadge presupuesto ─────────────────────────────────── */
+  .badge-status-ok      { @apply inline-block rounded-full px-2 py-0.5 text-xs font-semibold bg-[#E8F5E9] text-[#2E7D32] border border-[#A5D6A7]; }
+  .badge-status-warning { @apply inline-block rounded-full px-2 py-0.5 text-xs font-semibold bg-amber-50 text-amber-700 border border-amber-200; }
+  .badge-status-danger  { @apply inline-block rounded-full px-2 py-0.5 text-xs font-semibold bg-red-50 text-alten-red border border-alten-red/30; }
+
+  /* ── Alert error ─────────────────────────────────────────────── */
+  .alert-error {
+    @apply rounded border border-alten-red/30 bg-red-50 px-3 py-2 text-sm text-alten-red;
+  }
+
+  /* ── Alert success ───────────────────────────────────────────── */
+  .alert-success {
+    @apply rounded border border-[#A5D6A7] bg-[#E8F5E9] px-3 py-2 text-sm text-[#2E7D32];
+  }
+
+  /* ── Tab ─────────────────────────────────────────────────────── */
+  .tab-btn {
+    @apply px-5 py-2.5 text-sm font-semibold rounded-t border-b-[3px] transition-colors duration-200
+           focus:outline-none focus-visible:ring-2 focus-visible:ring-alten-blue;
+  }
+  .tab-btn-active   { @apply border-alten-blue text-alten-blue; }
+  .tab-btn-inactive { @apply border-transparent text-alten-mid hover:text-alten-body hover:border-alten-border; }
+
+  /* ── Sidebar ítem ────────────────────────────────────────────── */
+  .sidebar-item {
+    @apply flex items-center gap-3 px-4 py-2.5 text-sm font-medium
+           text-white/75 transition-colors duration-200 rounded
+           hover:bg-white/[0.08] hover:text-white;
+  }
+  .sidebar-item-active {
+    @apply flex items-center gap-3 px-4 py-2.5 text-sm font-semibold
+           bg-alten-blue text-white rounded
+           border-l-4 border-l-[#FFED00] transition-colors duration-200;
+  }
+
+  /* ── Sección de cabecera de página ──────────────────────────── */
+  .page-header {
+    @apply flex items-start justify-between mb-6 pb-4 border-b border-alten-border;
   }
 }

@@ -6,6 +6,15 @@ import { useCurrentUser } from '../lib/useCurrentUser.js'
 
 type Tab = 'proyectos' | 'herramientas' | 'historial'
 
+function formatDateFormal(date: Date): string {
+  return date.toLocaleDateString('es-ES', {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  })
+}
+
 export default function UserDashboard() {
   const { person } = useCurrentUser()
   const today = new Date().toISOString().slice(0, 7)
@@ -13,22 +22,26 @@ export default function UserDashboard() {
   const [periodMonth] = useState(today)
 
   const tabClass = (tab: Tab) =>
-    `px-4 py-2 text-sm font-medium rounded-t border-b-2 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 ${
-      activeTab === tab
-        ? 'border-blue-600 text-blue-700'
-        : 'border-transparent text-gray-500 hover:text-gray-700'
-    }`
+    `tab-btn ${activeTab === tab ? 'tab-btn-active' : 'tab-btn-inactive'}`
 
   return (
     <div>
-      <div className="mb-6">
-        <h1 className="text-xl font-bold text-gray-900">
-          Mi área{person ? ` — ${person.full_name}` : ''}
-        </h1>
-        <p className="text-sm text-gray-500">Gestiona tus proyectos, herramientas de IA y registra tu actividad</p>
+      {/* Cabecera de sección */}
+      <div className="page-header">
+        <div>
+          <h1 className="text-2xl font-bold text-alten-dark">Mi Área de Trabajo</h1>
+          <p className="text-[14px] text-alten-mid mt-1">
+            Bienvenido/a, <span className="font-medium text-alten-body">{person?.full_name ?? '—'}</span>
+            {' '}— ALTEN España
+          </p>
+        </div>
+        <p className="text-[13px] text-alten-mid text-right capitalize hidden sm:block mt-1">
+          {formatDateFormal(new Date())}
+        </p>
       </div>
 
-      <div role="tablist" aria-label="Secciones de mi área" className="flex gap-1 border-b border-gray-200 mb-6">
+      {/* Tabs */}
+      <div role="tablist" aria-label="Secciones de mi área" className="flex gap-0.5 border-b border-alten-border mb-6">
         <button
           role="tab"
           aria-selected={activeTab === 'proyectos'}
@@ -45,7 +58,7 @@ export default function UserDashboard() {
           className={tabClass('herramientas')}
           onClick={() => setActiveTab('herramientas')}
         >
-          Mis herramientas de IA
+          Herramientas de IA
         </button>
         <button
           role="tab"
@@ -58,25 +71,32 @@ export default function UserDashboard() {
         </button>
       </div>
 
-      {/* Proyectos */}
+      {/* Panel: Proyectos */}
       <div role="tabpanel" id="panel-proyectos" hidden={activeTab !== 'proyectos'}>
-        <p className="text-sm text-gray-500 mb-4">
-          Únete a los proyectos en los que participas. En cada proyecto que hayas unido puedes registrar el uso de tus herramientas de IA.
+        <p className="text-[14px] text-alten-mid mb-5">
+          Proyectos en los que participa su cuenta. Puede registrar el uso de herramientas de IA
+          en cada proyecto activo.
         </p>
         {person
           ? <JoinProjectSection personId={person.id} />
-          : <p className="text-sm text-gray-400">Cargando…</p>
+          : <p className="text-sm text-alten-mid">Cargando información de proyectos…</p>
         }
       </div>
 
-      {/* Mis herramientas */}
+      {/* Panel: Herramientas */}
       <div role="tabpanel" id="panel-herramientas" hidden={activeTab !== 'herramientas'}>
+        <p className="text-[14px] text-alten-mid mb-5">
+          Gestione las herramientas de IA asociadas a su cuenta. Las herramientas añadidas
+          estarán disponibles al registrar uso en proyectos.
+        </p>
         <MyToolsSection />
       </div>
 
-      {/* Historial */}
+      {/* Panel: Historial */}
       <div role="tabpanel" id="panel-historial" hidden={activeTab !== 'historial'}>
-        <p className="text-sm text-gray-500 mb-4">Registro de todo el uso de IA que has imputado a proyectos.</p>
+        <p className="text-[14px] text-alten-mid mb-5">
+          Registro histórico del uso de herramientas de IA imputado a proyectos.
+        </p>
         <UsageHistory periodMonth={periodMonth} />
       </div>
     </div>

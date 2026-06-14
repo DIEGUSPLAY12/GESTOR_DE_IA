@@ -54,26 +54,26 @@ function AddUsageForm({ projectId, onClose }: AddUsageFormProps) {
         <p className="text-sm text-amber-800">
           Añade herramientas de IA en la pestaña <strong>Mis herramientas</strong> antes de registrar uso.
         </p>
-        <button type="button" onClick={onClose} className="mt-2 text-xs text-gray-500 hover:text-gray-700">Cerrar</button>
+        <button type="button" onClick={onClose} className="mt-2 text-xs text-alten-mid hover:text-alten-body">Cerrar</button>
       </div>
     )
   }
 
   return (
-    <form onSubmit={handleSubmit} noValidate className="rounded-lg border border-gray-200 bg-white p-4 space-y-4">
-      <h4 className="text-sm font-semibold text-gray-800">Añadir uso de IA</h4>
-      {error && <p role="alert" className="text-sm text-red-600">{error}</p>}
+    <form onSubmit={handleSubmit} noValidate className="rounded-lg border border-alten-border bg-white p-4 space-y-4">
+      <h4 className="text-sm font-semibold text-alten-body">Añadir uso de IA</h4>
+      {error && <p role="alert" className="text-sm text-alten-red">{error}</p>}
 
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <label className="block text-xs font-medium text-gray-600 mb-1">
+          <label className="block text-xs font-medium text-alten-body mb-1">
             Herramienta <span aria-hidden="true">*</span>
           </label>
           <select
             required
             value={accountId}
             onChange={(e) => setAccountId(e.target.value)}
-            className="block w-full rounded border border-gray-300 px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="block w-full rounded border border-alten-border px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-alten-blue"
           >
             <option value="">— Selecciona —</option>
             {perSeatTools.map((t) => (
@@ -87,7 +87,7 @@ function AddUsageForm({ projectId, onClose }: AddUsageFormProps) {
         </div>
 
         <div>
-          <label className="block text-xs font-medium text-gray-600 mb-1">
+          <label className="block text-xs font-medium text-alten-body mb-1">
             Horas de uso <span aria-hidden="true">*</span>
           </label>
           <input
@@ -98,25 +98,25 @@ function AddUsageForm({ projectId, onClose }: AddUsageFormProps) {
             placeholder="ej. 40"
             value={hours}
             onChange={(e) => setHours(e.target.value)}
-            className="block w-full rounded border border-gray-300 px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="block w-full rounded border border-alten-border px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-alten-blue"
           />
         </div>
       </div>
 
       <div>
-        <label className="block text-xs font-medium text-gray-600 mb-1">Período</label>
+        <label className="block text-xs font-medium text-alten-body mb-1">Período</label>
         <input
           type="month"
           value={periodMonth}
           onChange={(e) => setPeriodMonth(e.target.value)}
-          className="block w-full max-w-[200px] rounded border border-gray-300 px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="block w-full max-w-[200px] rounded border border-alten-border px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-alten-blue"
         />
       </div>
 
       {previewCost !== null && (
-        <div className="rounded bg-blue-50 border border-blue-200 px-3 py-2 text-sm text-blue-800">
+        <div className="rounded bg-alten-pale border border-alten-mid-blue px-3 py-2 text-sm text-alten-dark">
           Coste estimado: <strong>{previewCost} {currency}</strong>
-          <span className="ml-2 text-xs text-blue-500">
+          <span className="ml-2 text-xs text-alten-blue">
             ({parsedHours}h × €{unitPrice?.toFixed(2)}/mes ÷ 160h)
           </span>
         </div>
@@ -126,14 +126,14 @@ function AddUsageForm({ projectId, onClose }: AddUsageFormProps) {
         <button
           type="submit"
           disabled={!accountId || parsedHours <= 0 || addUsage.isPending}
-          className="rounded bg-blue-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="rounded bg-alten-blue px-3 py-1.5 text-xs font-medium text-white hover:bg-alten-hover disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {addUsage.isPending ? 'Guardando…' : 'Guardar'}
         </button>
         <button
           type="button"
           onClick={onClose}
-          className="rounded border border-gray-300 px-3 py-1.5 text-xs text-gray-600 hover:bg-gray-50"
+          className="rounded border border-alten-border px-3 py-1.5 text-xs text-alten-body hover:bg-alten-light"
         >
           Cancelar
         </button>
@@ -172,10 +172,10 @@ function UsageRow({ entry, projectId }: UsageRowProps) {
   }
 
   return (
-    <tr className="border-t border-gray-100">
-      <td className="py-2 pr-4 text-sm text-gray-800">{label}</td>
-      <td className="py-2 pr-4 text-sm text-gray-600">{entry.period_month}</td>
-      <td className="py-2 pr-4 text-sm text-gray-600">
+    <tr className="border-t border-alten-light">
+      <td className="py-2 pr-4 text-sm text-alten-body">{label}</td>
+      <td className="py-2 pr-4 text-sm text-alten-body">{entry.period_month}</td>
+      <td className="py-2 pr-4 text-sm text-alten-body">
         {editing ? (
           <div className="flex items-center gap-1">
             <input
@@ -184,20 +184,20 @@ function UsageRow({ entry, projectId }: UsageRowProps) {
               step="0.5"
               value={hours}
               onChange={(e) => setHours(e.target.value)}
-              className="w-20 rounded border border-gray-300 px-1.5 py-0.5 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+              className="w-20 rounded border border-alten-border px-1.5 py-0.5 text-sm focus:outline-none focus:ring-1 focus:ring-alten-blue"
             />
             <button
               type="button"
               onClick={() => void handleSave()}
               disabled={updateUsage.isPending}
-              className="rounded bg-blue-600 px-2 py-0.5 text-xs text-white hover:bg-blue-700 disabled:opacity-50"
+              className="rounded bg-alten-blue px-2 py-0.5 text-xs text-white hover:bg-alten-hover disabled:opacity-50"
             >
               OK
             </button>
             <button
               type="button"
               onClick={() => { setEditing(false); setHours(String(entry.units_used)) }}
-              className="rounded border border-gray-300 px-2 py-0.5 text-xs text-gray-600 hover:bg-gray-50"
+              className="rounded border border-alten-border px-2 py-0.5 text-xs text-alten-body hover:bg-alten-light"
             >
               ✕
             </button>
@@ -206,7 +206,7 @@ function UsageRow({ entry, projectId }: UsageRowProps) {
           <span>{entry.units_used}h</span>
         )}
       </td>
-      <td className="py-2 pr-4 text-sm font-medium text-gray-900">
+      <td className="py-2 pr-4 text-sm font-medium text-alten-body">
         {Number(entry.calculated_cost).toFixed(2)} {entry.currency}
       </td>
       <td className="py-2 text-right">
@@ -215,7 +215,7 @@ function UsageRow({ entry, projectId }: UsageRowProps) {
             <button
               type="button"
               onClick={() => setEditing(true)}
-              className="text-xs text-blue-600 hover:underline"
+              className="text-xs text-alten-blue hover:underline"
             >
               Editar
             </button>
@@ -224,7 +224,7 @@ function UsageRow({ entry, projectId }: UsageRowProps) {
             type="button"
             onClick={() => void handleDelete()}
             disabled={deleteUsage.isPending}
-            className="text-xs text-red-500 hover:underline disabled:opacity-50"
+            className="text-xs text-alten-red hover:underline disabled:opacity-50"
           >
             Eliminar
           </button>
@@ -247,8 +247,8 @@ function LeaveModal({ projectName, onConfirm, onCancel, isPending }: LeaveModalP
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
       <div className="bg-white rounded-xl shadow-xl p-6 max-w-sm w-full mx-4">
-        <h3 className="text-base font-semibold text-gray-900 mb-2">Abandonar proyecto</h3>
-        <p className="text-sm text-gray-600 mb-6">
+        <h3 className="text-base font-semibold text-alten-body mb-2">Abandonar proyecto</h3>
+        <p className="text-sm text-alten-body mb-6">
           ¿Seguro que quieres abandonar <strong>{projectName}</strong>? Tu participación quedará cerrada con fecha de ayer.
         </p>
         <div className="flex gap-3 justify-end">
@@ -256,7 +256,7 @@ function LeaveModal({ projectName, onConfirm, onCancel, isPending }: LeaveModalP
             type="button"
             onClick={onCancel}
             disabled={isPending}
-            className="rounded border border-gray-300 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 disabled:opacity-50"
+            className="rounded border border-alten-border px-4 py-2 text-sm text-alten-body hover:bg-alten-light disabled:opacity-50"
           >
             Cancelar
           </button>
@@ -318,24 +318,24 @@ export default function ProjectDetailPage() {
       <button
         type="button"
         onClick={() => navigate('/dashboard')}
-        className="flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700"
+        className="flex items-center gap-1 text-sm text-alten-mid hover:text-alten-body"
       >
         ← Volver a mis proyectos
       </button>
 
       {/* Project info */}
       {project ? (
-        <div className="rounded-xl border border-gray-200 bg-white p-5 space-y-3">
+        <div className="rounded-xl border border-alten-border bg-white p-5 space-y-3">
           <div className="flex items-start justify-between gap-3">
             <div>
               <div className="flex items-center gap-2 flex-wrap mb-0.5">
-                <span className="font-mono text-xs text-gray-400">{project.code}</span>
-                <h1 className="text-lg font-bold text-gray-900">{project.name}</h1>
+                <span className="font-mono text-xs text-alten-mid">{project.code}</span>
+                <h1 className="text-lg font-bold text-alten-body">{project.name}</h1>
               </div>
-              <p className="text-sm text-gray-500">{project.client_name}</p>
+              <p className="text-sm text-alten-mid">{project.client_name}</p>
             </div>
             {isActive && (
-              <span className="flex-shrink-0 inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-700">
+              <span className="flex-shrink-0 inline-flex items-center rounded-full bg-alten-mid-blue px-2.5 py-0.5 text-xs font-medium text-alten-dark">
                 Participando
               </span>
             )}
@@ -343,43 +343,43 @@ export default function ProjectDetailPage() {
 
           <dl className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-sm">
             <div>
-              <dt className="text-xs text-gray-400 uppercase tracking-wider">Inicio</dt>
-              <dd className="font-medium text-gray-800 mt-0.5">{project.start_date}</dd>
+              <dt className="text-xs text-alten-mid uppercase tracking-wider">Inicio</dt>
+              <dd className="font-medium text-alten-body mt-0.5">{project.start_date}</dd>
             </div>
             <div>
-              <dt className="text-xs text-gray-400 uppercase tracking-wider">Fin</dt>
-              <dd className="font-medium text-gray-800 mt-0.5">{project.end_date ?? '—'}</dd>
+              <dt className="text-xs text-alten-mid uppercase tracking-wider">Fin</dt>
+              <dd className="font-medium text-alten-body mt-0.5">{project.end_date ?? '—'}</dd>
             </div>
             <div>
-              <dt className="text-xs text-gray-400 uppercase tracking-wider">Presupuesto mensual</dt>
-              <dd className="font-medium text-gray-800 mt-0.5">
+              <dt className="text-xs text-alten-mid uppercase tracking-wider">Presupuesto mensual</dt>
+              <dd className="font-medium text-alten-body mt-0.5">
                 {project.monthly_budget ? `€${Number(project.monthly_budget).toFixed(2)}` : '—'}
               </dd>
             </div>
             <div>
-              <dt className="text-xs text-gray-400 uppercase tracking-wider">Gasto registrado</dt>
-              <dd className="font-medium text-gray-800 mt-0.5">€{totalCost.toFixed(2)}</dd>
+              <dt className="text-xs text-alten-mid uppercase tracking-wider">Gasto registrado</dt>
+              <dd className="font-medium text-alten-body mt-0.5">€{totalCost.toFixed(2)}</dd>
             </div>
           </dl>
         </div>
       ) : (
-        <div className="rounded-xl border border-gray-200 bg-white p-5">
-          <p className="text-sm text-gray-400">Cargando información del proyecto…</p>
+        <div className="rounded-xl border border-alten-border bg-white p-5">
+          <p className="text-sm text-alten-mid">Cargando información del proyecto…</p>
         </div>
       )}
 
       {/* My participation */}
       {!loadingAssignment && assignment && (
-        <div className="rounded-xl border border-gray-200 bg-white p-5">
-          <h2 className="text-sm font-semibold text-gray-800 mb-3">Mi participación</h2>
+        <div className="rounded-xl border border-alten-border bg-white p-5">
+          <h2 className="text-sm font-semibold text-alten-body mb-3">Mi participación</h2>
           <dl className="grid grid-cols-2 gap-3 text-sm mb-4">
             <div>
-              <dt className="text-xs text-gray-400 uppercase tracking-wider">Desde</dt>
-              <dd className="font-medium text-gray-800 mt-0.5">{assignment.valid_from}</dd>
+              <dt className="text-xs text-alten-mid uppercase tracking-wider">Desde</dt>
+              <dd className="font-medium text-alten-body mt-0.5">{assignment.valid_from}</dd>
             </div>
             <div>
-              <dt className="text-xs text-gray-400 uppercase tracking-wider">Hasta</dt>
-              <dd className="font-medium text-gray-800 mt-0.5">
+              <dt className="text-xs text-alten-mid uppercase tracking-wider">Hasta</dt>
+              <dd className="font-medium text-alten-body mt-0.5">
                 {assignment.valid_to ?? 'Indefinido'}
               </dd>
             </div>
@@ -388,7 +388,7 @@ export default function ProjectDetailPage() {
             <button
               type="button"
               onClick={() => setShowLeaveModal(true)}
-              className="rounded border border-red-300 px-3 py-1.5 text-xs font-medium text-red-600 hover:bg-red-50"
+              className="rounded border border-alten-red/30 px-3 py-1.5 text-xs font-medium text-alten-red hover:bg-red-50"
             >
               Abandonar proyecto
             </button>
@@ -397,14 +397,14 @@ export default function ProjectDetailPage() {
       )}
 
       {/* AI usage */}
-      <div className="rounded-xl border border-gray-200 bg-white p-5">
+      <div className="rounded-xl border border-alten-border bg-white p-5">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-sm font-semibold text-gray-800">Mis IAs en este proyecto</h2>
+          <h2 className="text-sm font-semibold text-alten-body">Mis IAs en este proyecto</h2>
           {isActive && !showAddUsage && (
             <button
               type="button"
               onClick={() => setShowAddUsage(true)}
-              className="rounded bg-blue-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-blue-700"
+              className="rounded bg-alten-blue px-3 py-1.5 text-xs font-medium text-white hover:bg-alten-hover"
             >
               + Añadir IA
             </button>
@@ -418,18 +418,18 @@ export default function ProjectDetailPage() {
         )}
 
         {loadingUsage ? (
-          <p className="text-sm text-gray-400">Cargando registros…</p>
+          <p className="text-sm text-alten-mid">Cargando registros…</p>
         ) : (usageEntries ?? []).length === 0 ? (
-          <p className="text-sm text-gray-400">No hay registros de uso todavía.</p>
+          <p className="text-sm text-alten-mid">No hay registros de uso todavía.</p>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-left">
               <thead>
                 <tr>
-                  <th className="pb-2 pr-4 text-xs font-medium text-gray-400 uppercase tracking-wider">Herramienta</th>
-                  <th className="pb-2 pr-4 text-xs font-medium text-gray-400 uppercase tracking-wider">Período</th>
-                  <th className="pb-2 pr-4 text-xs font-medium text-gray-400 uppercase tracking-wider">Horas</th>
-                  <th className="pb-2 pr-4 text-xs font-medium text-gray-400 uppercase tracking-wider">Coste</th>
+                  <th className="pb-2 pr-4 text-xs font-medium text-alten-mid uppercase tracking-wider">Herramienta</th>
+                  <th className="pb-2 pr-4 text-xs font-medium text-alten-mid uppercase tracking-wider">Período</th>
+                  <th className="pb-2 pr-4 text-xs font-medium text-alten-mid uppercase tracking-wider">Horas</th>
+                  <th className="pb-2 pr-4 text-xs font-medium text-alten-mid uppercase tracking-wider">Coste</th>
                   <th className="pb-2" />
                 </tr>
               </thead>
@@ -440,9 +440,9 @@ export default function ProjectDetailPage() {
               </tbody>
               {(usageEntries ?? []).length > 1 && (
                 <tfoot>
-                  <tr className="border-t-2 border-gray-200">
-                    <td colSpan={3} className="pt-2 pr-4 text-xs font-semibold text-gray-500 uppercase">Total</td>
-                    <td className="pt-2 text-sm font-bold text-gray-900">€{totalCost.toFixed(2)}</td>
+                  <tr className="border-t-2 border-alten-border">
+                    <td colSpan={3} className="pt-2 pr-4 text-xs font-semibold text-alten-mid uppercase">Total</td>
+                    <td className="pt-2 text-sm font-bold text-alten-body">€{totalCost.toFixed(2)}</td>
                     <td />
                   </tr>
                 </tfoot>

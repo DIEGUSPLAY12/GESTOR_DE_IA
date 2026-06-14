@@ -31,22 +31,22 @@ function AccountCard({ account, isSubscribed, isPending, onSubscribe, onUnsubscr
 
   return (
     <div className={`rounded-lg border p-3 flex items-center justify-between gap-3 ${
-      isSubscribed ? 'border-blue-300 bg-blue-50' : 'border-gray-200 bg-white'
+      isSubscribed ? 'border-alten-mid-blue bg-alten-pale' : 'border-alten-border bg-white'
     }`}>
       <div className="min-w-0">
         <div className="flex items-center gap-2 flex-wrap">
-          <span className="text-sm font-medium text-gray-900 truncate">
+          <span className="text-sm font-medium text-alten-body truncate">
             {plan?.name ?? account.external_identifier}
           </span>
           {isSubscribed && (
-            <span className="text-xs bg-blue-600 text-white rounded-full px-2 py-0.5 font-medium">
+            <span className="text-xs bg-alten-blue text-white rounded-full px-2 py-0.5 font-medium">
               En mi perfil
             </span>
           )}
         </div>
-        <p className="text-xs text-gray-500 mt-0.5">
+        <p className="text-xs text-alten-mid mt-0.5">
           {account.external_identifier}
-          {monthlyPrice && <span className="ml-2 font-medium text-gray-700">{monthlyPrice}</span>}
+          {monthlyPrice && <span className="ml-2 font-medium text-alten-body">{monthlyPrice}</span>}
         </p>
       </div>
 
@@ -55,7 +55,7 @@ function AccountCard({ account, isSubscribed, isPending, onSubscribe, onUnsubscr
           type="button"
           disabled={isPending}
           onClick={() => onUnsubscribe(account.id)}
-          className="flex-shrink-0 rounded border border-gray-300 px-3 py-1 text-xs text-gray-600 hover:bg-gray-100 disabled:opacity-50"
+          className="flex-shrink-0 rounded border border-alten-border px-3 py-1 text-xs text-alten-body hover:bg-alten-light disabled:opacity-50"
         >
           Quitar
         </button>
@@ -64,7 +64,7 @@ function AccountCard({ account, isSubscribed, isPending, onSubscribe, onUnsubscr
           type="button"
           disabled={isPending}
           onClick={() => onSubscribe(account.id)}
-          className="flex-shrink-0 rounded bg-blue-600 px-3 py-1 text-xs font-medium text-white hover:bg-blue-700 disabled:opacity-50"
+          className="flex-shrink-0 rounded bg-alten-blue px-3 py-1 text-xs font-medium text-white hover:bg-alten-hover disabled:opacity-50"
         >
           + Añadir
         </button>
@@ -90,22 +90,22 @@ export function MyToolsSection() {
   const isPending = subscribe.isPending || unsubscribe.isPending
 
   if (loadingAll || loadingMine) {
-    return <p className="text-sm text-gray-400 py-4">Cargando herramientas…</p>
+    return <p className="text-sm text-alten-mid py-4">Cargando herramientas…</p>
   }
 
   return (
     <div className="space-y-6">
-      <p className="text-sm text-gray-500">
+      <p className="text-sm text-alten-mid">
         Añade las herramientas de IA que tienes suscritas. Aparecerán disponibles cuando registres uso en un proyecto.
       </p>
 
       {grouped.size === 0 && (
-        <p className="text-sm text-gray-400">No hay cuentas de IA configuradas en el sistema.</p>
+        <p className="text-sm text-alten-mid">No hay cuentas de IA configuradas en el sistema.</p>
       )}
 
       {Array.from(grouped.entries()).map(([provider, accounts]) => (
         <div key={provider}>
-          <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">{provider}</h3>
+          <h3 className="text-xs font-semibold text-alten-mid uppercase tracking-wider mb-2">{provider}</h3>
           <div className="space-y-2">
             {accounts.map((acc) => (
               <AccountCard

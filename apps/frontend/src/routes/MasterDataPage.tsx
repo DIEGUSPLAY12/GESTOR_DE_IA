@@ -20,10 +20,10 @@ export default function MasterDataPage() {
   const [editingProject, setEditingProject] = useState<Project | null>(null)
 
   const tabClass = (tab: Tab) =>
-    `px-4 py-2 text-sm font-medium rounded-t border-b-2 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 ${
+    `px-4 py-2 text-sm font-medium rounded-t border-b-2 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-alten-blue ${
       activeTab === tab
-        ? 'border-blue-600 text-blue-700'
-        : 'border-transparent text-gray-500 hover:text-gray-700'
+        ? 'border-alten-blue text-alten-blue'
+        : 'border-transparent text-alten-mid hover:text-alten-body'
     }`
 
   function handleEdit(project: Project) {
@@ -40,7 +40,7 @@ export default function MasterDataPage() {
     <div>
       <h1 className="text-2xl font-bold mb-6">Datos Maestros</h1>
 
-      <div role="tablist" aria-label="Secciones de datos maestros" className="flex gap-1 border-b border-gray-200 mb-6">
+      <div role="tablist" aria-label="Secciones de datos maestros" className="flex gap-1 border-b border-alten-border mb-6">
         {TABS.map(({ id, label }) => (
           <button
             key={id}
@@ -68,7 +68,7 @@ export default function MasterDataPage() {
               <button
                 type="button"
                 onClick={() => setProjectMode('create')}
-                className="rounded bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
+                className="rounded bg-alten-blue px-4 py-2 text-sm font-medium text-white hover:bg-alten-hover"
               >
                 + Nuevo proyecto
               </button>

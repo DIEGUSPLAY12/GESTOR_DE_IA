@@ -92,13 +92,13 @@ export function ImputationPanel() {
       <h2 id="imputation-heading" className="text-xl font-semibold mb-2">
         Calcular imputaciones
       </h2>
-      <p className="text-sm text-gray-500 mb-5">
+      <p className="text-sm text-alten-mid mb-5">
         Ejecuta el motor de imputación para el período seleccionado. El trabajo se encola en segundo plano y los resultados se reflejan en el dashboard de presupuestos.
       </p>
 
       <form onSubmit={handleCalculate} className="flex items-end gap-4 mb-6 flex-wrap">
         <div>
-          <label htmlFor="period-month" className="block text-sm font-medium text-gray-700 mb-1">
+          <label htmlFor="period-month" className="block text-sm font-medium text-alten-body mb-1">
             Período (YYYY-MM)
           </label>
           <input
@@ -107,20 +107,20 @@ export function ImputationPanel() {
             required
             value={periodMonth}
             onChange={(e) => setPeriodMonth(e.target.value)}
-            className="border border-gray-300 rounded px-3 py-1.5 text-sm focus:ring-2 focus:ring-blue-400 focus:outline-none"
+            className="border border-alten-border rounded px-3 py-1.5 text-sm focus:ring-2 focus:ring-alten-blue focus:outline-none"
           />
         </div>
         <button
           type="submit"
           disabled={loading}
-          className="px-4 py-1.5 text-sm font-medium text-white bg-blue-600 rounded hover:bg-blue-700 disabled:opacity-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-400"
+          className="px-4 py-1.5 text-sm font-medium text-white bg-alten-blue rounded hover:bg-alten-hover disabled:opacity-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-alten-blue"
         >
           {loading ? 'Lanzando…' : 'Calcular imputaciones'}
         </button>
       </form>
 
       {error && (
-        <div role="alert" className="mb-4 p-3 bg-red-50 border border-red-200 rounded text-sm text-red-700">
+        <div role="alert" className="mb-4 p-3 bg-red-50 border border-alten-red/30 rounded text-sm text-alten-red">
           {error}
         </div>
       )}
@@ -129,21 +129,21 @@ export function ImputationPanel() {
         <div
           role="status"
           aria-live="polite"
-          className="p-4 bg-green-50 border border-green-200 rounded space-y-3"
+          className="p-4 bg-alten-pale border border-alten-mid-blue rounded space-y-3"
         >
           <div className="flex items-center gap-2">
-            <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-700">
+            <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-alten-mid-blue text-alten-dark">
               {job.status === 'queued' ? 'Encolado' : job.status}
             </span>
-            <span className="text-sm text-gray-700 font-medium">
+            <span className="text-sm text-alten-body font-medium">
               Período: <strong>{job.periodMonth}</strong>
             </span>
-            <span className="text-xs text-gray-400 font-mono">
+            <span className="text-xs text-alten-mid font-mono">
               job#{String(job.jobId).slice(0, 12)}
             </span>
           </div>
 
-          <p className="text-sm text-gray-600">
+          <p className="text-sm text-alten-body">
             El cálculo se ejecuta en segundo plano. Los presupuestos se actualizarán automáticamente.
           </p>
 
@@ -151,12 +151,12 @@ export function ImputationPanel() {
             <button
               type="button"
               onClick={handleRefreshNow}
-              className="px-3 py-1 text-xs font-medium text-green-700 border border-green-400 rounded hover:bg-green-100 focus:outline-none focus-visible:ring-1 focus-visible:ring-green-500"
+              className="px-3 py-1 text-xs font-medium text-alten-dark border border-alten-mid-blue rounded hover:bg-alten-pale focus:outline-none focus-visible:ring-1 focus-visible:ring-alten-blue"
             >
               Refrescar presupuestos ahora
             </button>
             {countdown !== null && (
-              <span className="text-xs text-gray-400">
+              <span className="text-xs text-alten-mid">
                 Actualizando automáticamente en {countdown}s…
               </span>
             )}

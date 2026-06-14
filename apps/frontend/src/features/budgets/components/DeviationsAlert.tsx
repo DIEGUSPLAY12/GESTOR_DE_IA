@@ -4,7 +4,7 @@ import { BUDGET_STATUS_LABEL } from '../types.js'
 const STATUS_CLASSES: Record<BudgetStatus, { card: string; badge: string; bar: string }> = {
   OK: {
     card: 'border-green-200 bg-green-50',
-    badge: 'bg-green-100 text-green-800',
+    badge: 'bg-alten-mid-blue text-alten-dark',
     bar: 'bg-green-500',
   },
   WARNING: {
@@ -38,8 +38,8 @@ export function DeviationsAlert({ summary }: DeviationsAlertProps) {
     >
       <div className="flex items-start justify-between gap-2 mb-3">
         <div>
-          <p className="text-xs text-gray-500 font-mono">{project_code}</p>
-          <h3 className="font-semibold text-gray-900">{project_name}</h3>
+          <p className="text-xs text-alten-mid font-mono">{project_code}</p>
+          <h3 className="font-semibold text-alten-body">{project_name}</h3>
         </div>
         <span
           aria-label={`Estado: ${label}`}
@@ -56,7 +56,7 @@ export function DeviationsAlert({ summary }: DeviationsAlertProps) {
         aria-valuemin={0}
         aria-valuemax={100}
         aria-label={`Consumo: ${pct.toFixed(1)}%`}
-        className="w-full bg-gray-200 rounded-full h-2 mb-3"
+        className="w-full bg-alten-border rounded-full h-2 mb-3"
       >
         <div
           className={`h-2 rounded-full transition-all ${classes.bar}`}
@@ -65,7 +65,7 @@ export function DeviationsAlert({ summary }: DeviationsAlertProps) {
       </div>
 
       {/* Cost figures */}
-      <div className="flex justify-between text-sm text-gray-700">
+      <div className="flex justify-between text-sm text-alten-body">
         <span>
           Real:{' '}
           <strong>
@@ -92,7 +92,7 @@ export function DeviationsAlert({ summary }: DeviationsAlertProps) {
       {percentage_used != null && (
         <p
           aria-live="polite"
-          className="mt-1 text-xs text-gray-500 text-right"
+          className="mt-1 text-xs text-alten-mid text-right"
         >
           {pct.toFixed(1)}% consumido
         </p>

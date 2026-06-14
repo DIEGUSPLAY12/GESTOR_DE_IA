@@ -61,7 +61,7 @@ export function ProjectsTable({ onEdit }: ProjectsTableProps) {
 
   if (isLoading) {
     return (
-      <div role="status" aria-live="polite" className="py-8 text-center text-gray-500">
+      <div role="status" aria-live="polite" className="py-8 text-center text-alten-mid">
         Cargando proyectos…
       </div>
     )
@@ -69,7 +69,7 @@ export function ProjectsTable({ onEdit }: ProjectsTableProps) {
 
   if (error) {
     return (
-      <div role="alert" className="py-8 text-center text-red-600">
+      <div role="alert" className="py-8 text-center text-alten-red">
         Error al cargar proyectos: {error.message}
       </div>
     )
@@ -90,14 +90,14 @@ export function ProjectsTable({ onEdit }: ProjectsTableProps) {
           Proyectos
         </h2>
         <div className="flex items-center gap-2">
-          <label id={filterLabelId} className="text-sm text-gray-600">
+          <label id={filterLabelId} className="text-sm text-alten-body">
             Estado:
           </label>
           <select
             aria-labelledby={filterLabelId}
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value as StatusFilter)}
-            className="border border-gray-300 rounded px-2 py-1 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+            className="border border-alten-border rounded px-2 py-1 text-sm focus:ring-2 focus:ring-alten-blue focus:outline-none"
           >
             <option value="active">Activos</option>
             <option value="inactive">Inactivos</option>
@@ -107,14 +107,14 @@ export function ProjectsTable({ onEdit }: ProjectsTableProps) {
       </div>
 
       {sorted.length === 0 ? (
-        <p className="text-gray-500 text-sm py-4">No hay proyectos para mostrar.</p>
+        <p className="text-alten-mid text-sm py-4">No hay proyectos para mostrar.</p>
       ) : (
-        <div className="overflow-x-auto rounded-lg border border-gray-200">
+        <div className="overflow-x-auto rounded-lg border border-alten-border">
           <table
             role="table"
-            className="min-w-full divide-y divide-gray-200 text-sm"
+            className="min-w-full divide-y divide-alten-border text-sm"
           >
-            <thead className="bg-gray-50">
+            <thead className="bg-alten-light">
               <tr>
                 {COLUMNS.map(({ key, label }) => (
                   <th
@@ -128,45 +128,45 @@ export function ProjectsTable({ onEdit }: ProjectsTableProps) {
                           : 'descending'
                         : 'none'
                     }
-                    className="px-4 py-3 text-left font-medium text-gray-600 whitespace-nowrap"
+                    className="px-4 py-3 text-left font-medium text-alten-body whitespace-nowrap"
                   >
                     <button
                       type="button"
                       onClick={() => handleSort(key)}
-                      className="inline-flex items-center gap-1 hover:text-gray-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 rounded"
+                      className="inline-flex items-center gap-1 hover:text-alten-body focus:outline-none focus-visible:ring-2 focus-visible:ring-alten-blue rounded"
                     >
                       {label}
                       {sortKey === key ? (
                         <span aria-hidden="true">{sortDir === 'asc' ? ' ↑' : ' ↓'}</span>
                       ) : (
-                        <span aria-hidden="true" className="text-gray-300">
+                        <span aria-hidden="true" className="text-alten-border">
                           {' '}↕
                         </span>
                       )}
                     </button>
                   </th>
                 ))}
-                <th scope="col" className="px-4 py-3 text-left font-medium text-gray-600">
+                <th scope="col" className="px-4 py-3 text-left font-medium text-alten-body">
                   Estado
                 </th>
-                <th scope="col" className="px-4 py-3 text-right font-medium text-gray-600">
+                <th scope="col" className="px-4 py-3 text-right font-medium text-alten-body">
                   <span className="sr-only">Acciones</span>
                 </th>
               </tr>
             </thead>
-            <tbody className="bg-white divide-y divide-gray-100">
+            <tbody className="bg-white divide-y divide-alten-light">
               {sorted.map((project) => {
                 const active = isActive(project)
                 return (
                   <tr
                     key={project.id}
-                    className={active ? '' : 'opacity-50 bg-gray-50'}
+                    className={active ? '' : 'opacity-50 bg-alten-light'}
                   >
                     <td className="px-4 py-3 font-mono text-xs">{project.code}</td>
-                    <td className="px-4 py-3 font-medium text-gray-900">{project.name}</td>
-                    <td className="px-4 py-3 text-gray-600">{project.client_name}</td>
-                    <td className="px-4 py-3 text-gray-600">{project.start_date}</td>
-                    <td className="px-4 py-3 text-gray-600">
+                    <td className="px-4 py-3 font-medium text-alten-body">{project.name}</td>
+                    <td className="px-4 py-3 text-alten-body">{project.client_name}</td>
+                    <td className="px-4 py-3 text-alten-body">{project.start_date}</td>
+                    <td className="px-4 py-3 text-alten-body">
                       {project.monthly_budget != null
                         ? `${Number(project.monthly_budget).toLocaleString('es-ES', {
                             minimumFractionDigits: 2,
@@ -177,8 +177,8 @@ export function ProjectsTable({ onEdit }: ProjectsTableProps) {
                       <span
                         className={`inline-flex px-2 py-0.5 rounded-full text-xs font-medium ${
                           active
-                            ? 'bg-green-100 text-green-700'
-                            : 'bg-gray-100 text-gray-500'
+                            ? 'bg-alten-mid-blue text-alten-dark'
+                            : 'bg-alten-light text-alten-mid'
                         }`}
                       >
                         {active ? 'Activo' : 'Inactivo'}
@@ -189,7 +189,7 @@ export function ProjectsTable({ onEdit }: ProjectsTableProps) {
                         <button
                           type="button"
                           onClick={() => onEdit(project)}
-                          className="text-blue-600 hover:text-blue-800 text-xs mr-3 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 rounded"
+                          className="text-alten-blue hover:text-alten-hover text-xs mr-3 focus:outline-none focus-visible:ring-2 focus-visible:ring-alten-blue rounded"
                           aria-label={`Editar proyecto ${project.name}`}
                         >
                           Editar
@@ -200,7 +200,7 @@ export function ProjectsTable({ onEdit }: ProjectsTableProps) {
                           type="button"
                           onClick={() => handleDelete(project)}
                           disabled={deleteProject.isPending}
-                          className="text-red-500 hover:text-red-700 text-xs focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500 rounded disabled:opacity-50"
+                          className="text-alten-red hover:text-alten-red text-xs focus:outline-none focus-visible:ring-2 focus-visible:ring-alten-red rounded disabled:opacity-50"
                           aria-label={`Eliminar proyecto ${project.name}`}
                         >
                           Eliminar

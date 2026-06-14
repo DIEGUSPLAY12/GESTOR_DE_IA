@@ -72,17 +72,17 @@ export function ProjectForm({ project, onSuccess, onCancel }: ProjectFormProps) 
   }
 
   const inputClass =
-    'block w-full rounded border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500'
-  const labelClass = 'block text-sm font-medium text-gray-700 mb-1'
+    'block w-full rounded border border-alten-border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-alten-blue'
+  const labelClass = 'block text-sm font-medium text-alten-body mb-1'
 
   return (
     <form onSubmit={handleSubmit} noValidate className="space-y-4">
-      <h3 className="text-lg font-semibold text-gray-900">
+      <h3 className="text-lg font-semibold text-alten-body">
         {isEdit ? `Editar proyecto — ${project!.code}` : 'Nuevo proyecto'}
       </h3>
 
       {error && (
-        <div role="alert" className="rounded border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
+        <div role="alert" className="rounded border border-alten-red/30 bg-red-50 px-3 py-2 text-sm text-alten-red">
           {error}
         </div>
       )}
@@ -169,7 +169,7 @@ export function ProjectForm({ project, onSuccess, onCancel }: ProjectFormProps) 
 
         <div>
           <label htmlFor="proj-end" className={labelClass}>
-            Fecha fin <span className="text-gray-400 text-xs">(opcional)</span>
+            Fecha fin <span className="text-alten-mid text-xs">(opcional)</span>
           </label>
           <input
             id="proj-end"
@@ -183,7 +183,7 @@ export function ProjectForm({ project, onSuccess, onCancel }: ProjectFormProps) 
 
         <div>
           <label htmlFor="proj-budget" className={labelClass}>
-            Presupuesto mensual € <span className="text-gray-400 text-xs">(opcional)</span>
+            Presupuesto mensual € <span className="text-alten-mid text-xs">(opcional)</span>
           </label>
           <input
             id="proj-budget"
@@ -203,7 +203,7 @@ export function ProjectForm({ project, onSuccess, onCancel }: ProjectFormProps) 
           <button
             type="button"
             onClick={onCancel}
-            className="px-4 py-2 text-sm text-gray-600 border border-gray-300 rounded hover:bg-gray-50"
+            className="px-4 py-2 text-sm text-alten-body border border-alten-border rounded hover:bg-alten-light"
           >
             Cancelar
           </button>
@@ -211,7 +211,7 @@ export function ProjectForm({ project, onSuccess, onCancel }: ProjectFormProps) 
         <button
           type="submit"
           disabled={isPending}
-          className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="px-4 py-2 text-sm font-medium text-white bg-alten-blue rounded hover:bg-alten-hover disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {isPending ? 'Guardando…' : isEdit ? 'Guardar cambios' : 'Crear proyecto'}
         </button>

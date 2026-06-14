@@ -5,9 +5,9 @@ interface BadgeProps {
 }
 
 const config: Record<Status, { label: string; className: string }> = {
-  OK: { label: 'OK', className: 'bg-green-100 text-green-800' },
+  OK:      { label: 'OK',          className: 'bg-alten-mid-blue text-alten-dark' },
   WARNING: { label: 'Advertencia', className: 'bg-amber-100 text-amber-800' },
-  DANGER: { label: 'Peligro', className: 'bg-red-100 text-red-800' },
+  DANGER:  { label: 'Peligro',     className: 'bg-alten-red text-white' },
 }
 
 export function StatusBadge({ status }: BadgeProps) {

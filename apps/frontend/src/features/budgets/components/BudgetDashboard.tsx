@@ -51,7 +51,7 @@ function CustomTooltip({ active, payload, label }: CustomTooltipProps) {
   if (!active || !payload?.length) return null
   const pct = payload[0]?.payload.pct ?? null
   return (
-    <div className="bg-white border border-gray-200 rounded shadow p-3 text-sm">
+    <div className="bg-white border border-alten-border rounded shadow p-3 text-sm">
       <p className="font-semibold mb-1">{label}</p>
       {payload.map((entry) => (
         <p key={entry.name} style={{ color: entry.color }}>
@@ -63,7 +63,7 @@ function CustomTooltip({ active, payload, label }: CustomTooltipProps) {
           €
         </p>
       ))}
-      {pct != null && <p className="text-gray-500 mt-1">{pct.toFixed(1)}% consumido</p>}
+      {pct != null && <p className="text-alten-mid mt-1">{pct.toFixed(1)}% consumido</p>}
     </div>
   )
 }
@@ -87,17 +87,17 @@ function SummaryCards({ summaries }: SummaryCardsProps) {
 
   return (
     <div className="grid grid-cols-3 gap-4 mb-6">
-      <div className="rounded-lg border border-gray-200 bg-white px-4 py-3">
-        <p className="text-xs text-gray-500 uppercase tracking-wide">Presupuesto total</p>
-        <p className="mt-1 text-xl font-bold text-gray-900 tabular-nums">{fmt(totalBudget)} €</p>
+      <div className="rounded-lg border border-alten-border bg-white px-4 py-3">
+        <p className="text-xs text-alten-mid uppercase tracking-wide">Presupuesto total</p>
+        <p className="mt-1 text-xl font-bold text-alten-body tabular-nums">{fmt(totalBudget)} €</p>
       </div>
-      <div className="rounded-lg border border-gray-200 bg-white px-4 py-3">
-        <p className="text-xs text-gray-500 uppercase tracking-wide">Gasto acumulado</p>
-        <p className="mt-1 text-xl font-bold text-gray-900 tabular-nums">{fmt(totalSpent)} €</p>
+      <div className="rounded-lg border border-alten-border bg-white px-4 py-3">
+        <p className="text-xs text-alten-mid uppercase tracking-wide">Gasto acumulado</p>
+        <p className="mt-1 text-xl font-bold text-alten-body tabular-nums">{fmt(totalSpent)} €</p>
       </div>
-      <div className={`rounded-lg border px-4 py-3 ${remainingPositive ? 'border-green-200 bg-green-50' : 'border-red-200 bg-red-50'}`}>
-        <p className="text-xs text-gray-500 uppercase tracking-wide">Restante</p>
-        <p className={`mt-1 text-xl font-bold tabular-nums ${remainingPositive ? 'text-green-700' : 'text-red-700'}`}>
+      <div className={`rounded-lg border px-4 py-3 ${remainingPositive ? 'border-alten-mid-blue bg-alten-pale' : 'border-alten-red/30 bg-red-50'}`}>
+        <p className="text-xs text-alten-mid uppercase tracking-wide">Restante</p>
+        <p className={`mt-1 text-xl font-bold tabular-nums ${remainingPositive ? 'text-alten-dark' : 'text-alten-red'}`}>
           {fmt(totalRemaining)} €
         </p>
       </div>
@@ -120,7 +120,7 @@ export function BudgetDashboard() {
           Presupuestos
         </h2>
         <div className="flex items-center gap-2">
-          <label htmlFor="period-select" className="text-sm text-gray-600">
+          <label htmlFor="period-select" className="text-sm text-alten-body">
             Periodo:
           </label>
           <input
@@ -128,25 +128,25 @@ export function BudgetDashboard() {
             type="month"
             value={periodMonth}
             onChange={(e) => setPeriodMonth(e.target.value)}
-            className="border border-gray-300 rounded px-2 py-1 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+            className="border border-alten-border rounded px-2 py-1 text-sm focus:ring-2 focus:ring-alten-blue focus:outline-none"
           />
         </div>
       </div>
 
       {isLoading && (
-        <div role="status" aria-live="polite" className="py-12 text-center text-gray-500">
+        <div role="status" aria-live="polite" className="py-12 text-center text-alten-mid">
           Cargando presupuestos…
         </div>
       )}
 
       {error && (
-        <div role="alert" className="py-8 text-center text-red-600">
+        <div role="alert" className="py-8 text-center text-alten-red">
           Error al cargar presupuestos: {error.message}
         </div>
       )}
 
       {!isLoading && !error && !hasData && (
-        <p className="text-gray-500 text-sm py-8 text-center">
+        <p className="text-alten-mid text-sm py-8 text-center">
           No hay datos de presupuesto para {periodMonth}.
         </p>
       )}
@@ -188,7 +188,7 @@ export function BudgetDashboard() {
 
               {/* Accessible table alternative */}
               <details className="mt-2">
-                <summary className="text-xs text-gray-400 cursor-pointer hover:text-gray-600">
+                <summary className="text-xs text-alten-mid cursor-pointer hover:text-alten-body">
                   Ver datos en tabla
                 </summary>
                 <div className="mt-2 overflow-x-auto">
@@ -196,21 +196,21 @@ export function BudgetDashboard() {
                     <caption className="sr-only">
                       Presupuesto vs coste real por proyecto — {periodMonth}
                     </caption>
-                    <thead className="bg-gray-50">
+                    <thead className="bg-alten-light">
                       <tr>
-                        <th scope="col" className="px-3 py-2 text-left text-xs font-medium text-gray-500">
+                        <th scope="col" className="px-3 py-2 text-left text-xs font-medium text-alten-mid">
                           Proyecto
                         </th>
-                        <th scope="col" className="px-3 py-2 text-right text-xs font-medium text-gray-500">
+                        <th scope="col" className="px-3 py-2 text-right text-xs font-medium text-alten-mid">
                           Presupuesto
                         </th>
-                        <th scope="col" className="px-3 py-2 text-right text-xs font-medium text-gray-500">
+                        <th scope="col" className="px-3 py-2 text-right text-xs font-medium text-alten-mid">
                           Coste real
                         </th>
-                        <th scope="col" className="px-3 py-2 text-right text-xs font-medium text-gray-500">
+                        <th scope="col" className="px-3 py-2 text-right text-xs font-medium text-alten-mid">
                           % consumido
                         </th>
-                        <th scope="col" className="px-3 py-2 text-right text-xs font-medium text-gray-500">
+                        <th scope="col" className="px-3 py-2 text-right text-xs font-medium text-alten-mid">
                           Restante
                         </th>
                       </tr>
@@ -224,16 +224,16 @@ export function BudgetDashboard() {
                         return (
                           <tr key={s.project_id}>
                             <td className="px-3 py-2 font-mono text-xs">{s.project_code}</td>
-                            <td className="px-3 py-2 text-right text-gray-700">
+                            <td className="px-3 py-2 text-right text-alten-body">
                               {budget != null ? `${fmt(budget)} €` : '—'}
                             </td>
-                            <td className="px-3 py-2 text-right text-gray-700">
+                            <td className="px-3 py-2 text-right text-alten-body">
                               {fmt(spent)} €
                             </td>
-                            <td className="px-3 py-2 text-right text-gray-700">
+                            <td className="px-3 py-2 text-right text-alten-body">
                               {s.percentage_used != null ? `${s.percentage_used.toFixed(1)}%` : '—'}
                             </td>
-                            <td className={`px-3 py-2 text-right font-medium ${remainingPos ? 'text-green-700' : 'text-red-600'}`}>
+                            <td className={`px-3 py-2 text-right font-medium ${remainingPos ? 'text-alten-dark' : 'text-alten-red'}`}>
                               {remaining != null ? `${fmt(remaining)} €` : '—'}
                             </td>
                           </tr>
@@ -245,7 +245,7 @@ export function BudgetDashboard() {
               </details>
             </div>
           ) : (
-            <p className="text-sm text-gray-400 mb-6 italic">
+            <p className="text-sm text-alten-mid mb-6 italic">
               Ningún proyecto tiene presupuesto configurado para este periodo.
             </p>
           )}

@@ -71,21 +71,21 @@ export function OwnershipForm({ accountId }: Props) {
   const activePeople = (people ?? []).filter((p) => p.deleted_at === null)
 
   return (
-    <div className="mt-3 pl-4 border-l-2 border-gray-100">
-      <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Titulares</h4>
+    <div className="mt-3 pl-4 border-l-2 border-alten-light">
+      <h4 className="text-xs font-semibold text-alten-mid uppercase tracking-wide mb-2">Titulares</h4>
 
       {loadingOwners && (
-        <p className="text-xs text-gray-400 py-1">Cargando titulares…</p>
+        <p className="text-xs text-alten-mid py-1">Cargando titulares…</p>
       )}
 
       {!loadingOwners && activeOwnerships.length === 0 && (
-        <p className="text-xs text-gray-400 py-1">Sin titulares asignados.</p>
+        <p className="text-xs text-alten-mid py-1">Sin titulares asignados.</p>
       )}
 
       {!loadingOwners && activeOwnerships.length > 0 && (
         <table className="min-w-full text-xs mb-3">
           <thead>
-            <tr className="text-gray-400">
+            <tr className="text-alten-mid">
               <th scope="col" className="text-left pr-4 py-1 font-medium">Persona</th>
               <th scope="col" className="text-right pr-4 py-1 font-medium">%</th>
               <th scope="col" className="text-left pr-4 py-1 font-medium">Desde</th>
@@ -95,29 +95,29 @@ export function OwnershipForm({ accountId }: Props) {
           <tbody className="divide-y divide-gray-50">
             {activeOwnerships.map((o) => (
               <tr key={o.id}>
-                <td className="pr-4 py-1.5 text-gray-800">
+                <td className="pr-4 py-1.5 text-alten-body">
                   {o.person ? (
                     <span title={o.person.email}>{o.person.full_name}</span>
                   ) : (
-                    <span className="font-mono text-gray-400">{o.person_id.slice(0, 8)}…</span>
+                    <span className="font-mono text-alten-mid">{o.person_id.slice(0, 8)}…</span>
                   )}
                 </td>
-                <td className="pr-4 py-1.5 text-right font-medium text-gray-700">
+                <td className="pr-4 py-1.5 text-right font-medium text-alten-body">
                   {Number(o.percentage).toFixed(2)}%
                 </td>
-                <td className="pr-4 py-1.5 text-gray-500">{o.valid_from}</td>
-                <td className="py-1.5 text-gray-500">
-                  {o.valid_to ?? <span className="text-gray-400">vigente</span>}
+                <td className="pr-4 py-1.5 text-alten-mid">{o.valid_from}</td>
+                <td className="py-1.5 text-alten-mid">
+                  {o.valid_to ?? <span className="text-alten-mid">vigente</span>}
                 </td>
               </tr>
             ))}
           </tbody>
           <tfoot>
-            <tr className="border-t border-gray-200">
-              <td className="pr-4 py-1.5 text-xs text-gray-500 font-medium">Total activo</td>
+            <tr className="border-t border-alten-border">
+              <td className="pr-4 py-1.5 text-xs text-alten-mid font-medium">Total activo</td>
               <td
                 className={`pr-4 py-1.5 text-right text-xs font-bold ${
-                  currentTotal > 100 ? 'text-red-600' : currentTotal >= 90 ? 'text-amber-600' : 'text-gray-700'
+                  currentTotal > 100 ? 'text-alten-red' : currentTotal >= 90 ? 'text-amber-600' : 'text-alten-body'
                 }`}
               >
                 {currentTotal.toFixed(2)}%
@@ -132,7 +132,7 @@ export function OwnershipForm({ accountId }: Props) {
         <button
           type="button"
           onClick={() => setShowForm(true)}
-          className="text-xs text-blue-600 hover:text-blue-800 focus:outline-none focus-visible:ring-1 focus-visible:ring-blue-400 rounded"
+          className="text-xs text-alten-blue hover:text-alten-hover focus:outline-none focus-visible:ring-1 focus-visible:ring-alten-blue rounded"
         >
           + Añadir titular
         </button>
@@ -140,22 +140,22 @@ export function OwnershipForm({ accountId }: Props) {
         <form
           id={`${formId}-ownership`}
           onSubmit={handleSubmit}
-          className="mt-2 space-y-2 max-w-lg bg-gray-50 border border-gray-200 rounded p-3"
+          className="mt-2 space-y-2 max-w-lg bg-alten-light border border-alten-border rounded p-3"
         >
           <div className="grid grid-cols-2 gap-2">
             <div className="col-span-2">
-              <label htmlFor={`${formId}-person`} className="block text-xs font-medium text-gray-600 mb-0.5">
+              <label htmlFor={`${formId}-person`} className="block text-xs font-medium text-alten-body mb-0.5">
                 Persona *
               </label>
               {loadingPeople ? (
-                <p className="text-xs text-gray-400">Cargando personas…</p>
+                <p className="text-xs text-alten-mid">Cargando personas…</p>
               ) : (
                 <select
                   id={`${formId}-person`}
                   required
                   value={personId}
                   onChange={(e) => setPersonId(e.target.value)}
-                  className="w-full border border-gray-300 rounded px-2 py-1 text-xs focus:ring-1 focus:ring-blue-400 focus:outline-none"
+                  className="w-full border border-alten-border rounded px-2 py-1 text-xs focus:ring-1 focus:ring-alten-blue focus:outline-none"
                 >
                   <option value="">Selecciona persona…</option>
                   {activePeople.map((p) => (
@@ -168,7 +168,7 @@ export function OwnershipForm({ accountId }: Props) {
             </div>
 
             <div>
-              <label htmlFor={`${formId}-pct`} className="block text-xs font-medium text-gray-600 mb-0.5">
+              <label htmlFor={`${formId}-pct`} className="block text-xs font-medium text-alten-body mb-0.5">
                 Porcentaje (%) *
               </label>
               <input
@@ -181,7 +181,7 @@ export function OwnershipForm({ accountId }: Props) {
                 value={percentage}
                 onChange={(e) => handlePercentageChange(e.target.value)}
                 className={`w-full border rounded px-2 py-1 text-xs focus:ring-1 focus:outline-none ${
-                  warning ? 'border-amber-400 focus:ring-amber-400' : 'border-gray-300 focus:ring-blue-400'
+                  warning ? 'border-amber-400 focus:ring-amber-400' : 'border-alten-border focus:ring-alten-blue'
                 }`}
               />
               {warning && (
@@ -192,7 +192,7 @@ export function OwnershipForm({ accountId }: Props) {
             </div>
 
             <div>
-              <label htmlFor={`${formId}-from`} className="block text-xs font-medium text-gray-600 mb-0.5">
+              <label htmlFor={`${formId}-from`} className="block text-xs font-medium text-alten-body mb-0.5">
                 Válido desde *
               </label>
               <input
@@ -201,12 +201,12 @@ export function OwnershipForm({ accountId }: Props) {
                 required
                 value={validFrom}
                 onChange={(e) => setValidFrom(e.target.value)}
-                className="w-full border border-gray-300 rounded px-2 py-1 text-xs focus:ring-1 focus:ring-blue-400 focus:outline-none"
+                className="w-full border border-alten-border rounded px-2 py-1 text-xs focus:ring-1 focus:ring-alten-blue focus:outline-none"
               />
             </div>
 
             <div>
-              <label htmlFor={`${formId}-to`} className="block text-xs font-medium text-gray-600 mb-0.5">
+              <label htmlFor={`${formId}-to`} className="block text-xs font-medium text-alten-body mb-0.5">
                 Válido hasta
               </label>
               <input
@@ -214,13 +214,13 @@ export function OwnershipForm({ accountId }: Props) {
                 type="date"
                 value={validTo}
                 onChange={(e) => setValidTo(e.target.value)}
-                className="w-full border border-gray-300 rounded px-2 py-1 text-xs focus:ring-1 focus:ring-blue-400 focus:outline-none"
+                className="w-full border border-alten-border rounded px-2 py-1 text-xs focus:ring-1 focus:ring-alten-blue focus:outline-none"
               />
             </div>
           </div>
 
           {error && (
-            <p role="alert" className="text-xs text-red-600">
+            <p role="alert" className="text-xs text-alten-red">
               {error}
             </p>
           )}
@@ -229,14 +229,14 @@ export function OwnershipForm({ accountId }: Props) {
             <button
               type="submit"
               disabled={assignOwner.isPending}
-              className="px-3 py-1 text-xs font-medium text-white bg-blue-600 rounded hover:bg-blue-700 disabled:opacity-50 focus:outline-none focus-visible:ring-1 focus-visible:ring-blue-400"
+              className="px-3 py-1 text-xs font-medium text-white bg-alten-blue rounded hover:bg-alten-hover disabled:opacity-50 focus:outline-none focus-visible:ring-1 focus-visible:ring-alten-blue"
             >
               {assignOwner.isPending ? 'Guardando…' : 'Asignar titular'}
             </button>
             <button
               type="button"
               onClick={() => { setShowForm(false); setError(null); setWarning(null) }}
-              className="px-3 py-1 text-xs text-gray-500 border border-gray-300 rounded hover:bg-gray-50 focus:outline-none focus-visible:ring-1 focus-visible:ring-gray-300"
+              className="px-3 py-1 text-xs text-alten-mid border border-alten-border rounded hover:bg-alten-light focus:outline-none focus-visible:ring-1 focus-visible:ring-alten-border"
             >
               Cancelar
             </button>

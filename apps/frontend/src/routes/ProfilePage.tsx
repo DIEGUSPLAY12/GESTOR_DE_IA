@@ -96,36 +96,36 @@ export default function ProfilePage() {
         <button
           type="button"
           onClick={() => navigate(-1)}
-          className="text-gray-400 hover:text-gray-600 text-sm"
+          className="text-alten-mid hover:text-alten-body text-sm"
         >
           ← Volver
         </button>
-        <h1 className="text-xl font-bold text-gray-900">Mi perfil</h1>
+        <h1 className="text-xl font-bold text-alten-body">Mi perfil</h1>
       </div>
 
       {/* Personal info section */}
-      <section className="bg-white rounded-lg border border-gray-200 p-6 mb-4">
-        <h2 className="text-base font-semibold text-gray-900 mb-4">Información personal</h2>
+      <section className="bg-white rounded-lg border border-alten-border p-6 mb-4">
+        <h2 className="text-base font-semibold text-alten-body mb-4">Información personal</h2>
 
         <div className="mb-4">
-          <p className="text-xs text-gray-500 uppercase tracking-wide mb-0.5">Correo electrónico</p>
-          <p className="text-sm text-gray-900">{user?.email}</p>
+          <p className="text-xs text-alten-mid uppercase tracking-wide mb-0.5">Correo electrónico</p>
+          <p className="text-sm text-alten-body">{user?.email}</p>
         </div>
 
         {nameSuccess && (
-          <div role="status" className="mb-3 rounded border border-green-200 bg-green-50 px-3 py-2 text-sm text-green-700">
+          <div role="status" className="mb-3 rounded border border-alten-mid-blue bg-green-50 px-3 py-2 text-sm text-alten-dark">
             Nombre actualizado correctamente.
           </div>
         )}
         {nameError && (
-          <div role="alert" className="mb-3 rounded border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
+          <div role="alert" className="mb-3 rounded border border-alten-red/30 bg-red-50 px-3 py-2 text-sm text-alten-red">
             {nameError}
           </div>
         )}
 
         <form onSubmit={handleNameSubmit} noValidate className="space-y-3">
           <div>
-            <label htmlFor="profile-name" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="profile-name" className="block text-sm font-medium text-alten-body mb-1">
               Nombre completo
             </label>
             <input
@@ -133,7 +133,7 @@ export default function ProfilePage() {
               type="text"
               autoComplete="name"
               required
-              className="block w-full rounded border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="block w-full rounded border border-alten-border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-alten-blue"
               value={fullName}
               onChange={(e) => { setFullName(e.target.value); setNameSuccess(false) }}
             />
@@ -141,7 +141,7 @@ export default function ProfilePage() {
           <button
             type="submit"
             disabled={nameSaving || !fullName.trim() || !person}
-            className="rounded bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="rounded bg-alten-blue px-4 py-2 text-sm font-semibold text-white hover:bg-alten-hover disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {nameSaving ? 'Guardando…' : 'Guardar nombre'}
           </button>
@@ -149,23 +149,23 @@ export default function ProfilePage() {
       </section>
 
       {/* Password section */}
-      <section className="bg-white rounded-lg border border-gray-200 p-6">
-        <h2 className="text-base font-semibold text-gray-900 mb-4">Cambiar contraseña</h2>
+      <section className="bg-white rounded-lg border border-alten-border p-6">
+        <h2 className="text-base font-semibold text-alten-body mb-4">Cambiar contraseña</h2>
 
         {passwordSuccess && (
-          <div role="status" className="mb-3 rounded border border-green-200 bg-green-50 px-3 py-2 text-sm text-green-700">
+          <div role="status" className="mb-3 rounded border border-alten-mid-blue bg-green-50 px-3 py-2 text-sm text-alten-dark">
             Contraseña actualizada correctamente.
           </div>
         )}
         {passwordError && (
-          <div role="alert" className="mb-3 rounded border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
+          <div role="alert" className="mb-3 rounded border border-alten-red/30 bg-red-50 px-3 py-2 text-sm text-alten-red">
             {passwordError}
           </div>
         )}
 
         <form onSubmit={handlePasswordSubmit} noValidate className="space-y-3">
           <div>
-            <label htmlFor="current-password" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="current-password" className="block text-sm font-medium text-alten-body mb-1">
               Contraseña actual
             </label>
             <input
@@ -173,13 +173,13 @@ export default function ProfilePage() {
               type="password"
               autoComplete="current-password"
               required
-              className="block w-full rounded border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="block w-full rounded border border-alten-border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-alten-blue"
               value={currentPassword}
               onChange={(e) => { setCurrentPassword(e.target.value); setPasswordSuccess(false) }}
             />
           </div>
           <div>
-            <label htmlFor="new-password" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="new-password" className="block text-sm font-medium text-alten-body mb-1">
               Nueva contraseña
             </label>
             <input
@@ -188,13 +188,13 @@ export default function ProfilePage() {
               autoComplete="new-password"
               required
               minLength={6}
-              className="block w-full rounded border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="block w-full rounded border border-alten-border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-alten-blue"
               value={newPassword}
               onChange={(e) => { setNewPassword(e.target.value); setPasswordSuccess(false) }}
             />
           </div>
           <div>
-            <label htmlFor="confirm-password" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="confirm-password" className="block text-sm font-medium text-alten-body mb-1">
               Confirmar nueva contraseña
             </label>
             <input
@@ -203,7 +203,7 @@ export default function ProfilePage() {
               autoComplete="new-password"
               required
               minLength={6}
-              className="block w-full rounded border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="block w-full rounded border border-alten-border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-alten-blue"
               value={confirmPassword}
               onChange={(e) => { setConfirmPassword(e.target.value); setPasswordSuccess(false) }}
             />
@@ -211,7 +211,7 @@ export default function ProfilePage() {
           <button
             type="submit"
             disabled={passwordSaving || !currentPassword || !newPassword || !confirmPassword}
-            className="rounded bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="rounded bg-alten-blue px-4 py-2 text-sm font-semibold text-white hover:bg-alten-hover disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {passwordSaving ? 'Guardando…' : 'Cambiar contraseña'}
           </button>

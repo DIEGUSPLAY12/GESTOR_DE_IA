@@ -10,7 +10,7 @@ import { OwnershipForm } from './OwnershipForm.js'
 import type { AiAccount, CreateAccountInput, PlanType } from '../types.js'
 
 const PLAN_TYPE_BADGE: Record<PlanType, string> = {
-  PER_SEAT: 'bg-blue-100 text-blue-700',
+  PER_SEAT: 'bg-alten-pale text-alten-blue',
   POOL_SLOT: 'bg-purple-100 text-purple-700',
   PAY_PER_TOKEN: 'bg-orange-100 text-orange-700',
   VOLUME_TIER: 'bg-teal-100 text-teal-700',
@@ -76,24 +76,24 @@ function CreateAccountForm({ onClose }: CreateFormProps) {
   return (
     <form
       onSubmit={handleSubmit}
-      className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg space-y-3 max-w-2xl"
+      className="mb-6 p-4 bg-alten-pale border border-alten-mid-blue rounded-lg space-y-3 max-w-2xl"
     >
-      <h3 className="text-sm font-semibold text-gray-700">Nueva cuenta de IA</h3>
+      <h3 className="text-sm font-semibold text-alten-body">Nueva cuenta de IA</h3>
 
       <div className="grid grid-cols-2 gap-3">
         <div>
-          <label htmlFor={`${formId}-provider`} className="block text-xs font-medium text-gray-600 mb-0.5">
+          <label htmlFor={`${formId}-provider`} className="block text-xs font-medium text-alten-body mb-0.5">
             Proveedor *
           </label>
           {loadingProviders ? (
-            <p className="text-xs text-gray-400">Cargando proveedores…</p>
+            <p className="text-xs text-alten-mid">Cargando proveedores…</p>
           ) : (
             <select
               id={`${formId}-provider`}
               required
               value={selectedProviderId}
               onChange={(e) => { setSelectedProviderId(e.target.value); setPlanId('') }}
-              className="w-full border border-gray-300 rounded px-2 py-1.5 text-sm focus:ring-2 focus:ring-blue-400 focus:outline-none"
+              className="w-full border border-alten-border rounded px-2 py-1.5 text-sm focus:ring-2 focus:ring-alten-blue focus:outline-none"
             >
               <option value="">Selecciona proveedor…</option>
               {activeProviders.map((p) => (
@@ -104,7 +104,7 @@ function CreateAccountForm({ onClose }: CreateFormProps) {
         </div>
 
         <div>
-          <label htmlFor={`${formId}-plan`} className="block text-xs font-medium text-gray-600 mb-0.5">
+          <label htmlFor={`${formId}-plan`} className="block text-xs font-medium text-alten-body mb-0.5">
             Plan de precios *
           </label>
           <select
@@ -113,7 +113,7 @@ function CreateAccountForm({ onClose }: CreateFormProps) {
             disabled={!selectedProviderId}
             value={planId}
             onChange={(e) => setPlanId(e.target.value)}
-            className="w-full border border-gray-300 rounded px-2 py-1.5 text-sm focus:ring-2 focus:ring-blue-400 focus:outline-none disabled:bg-gray-100 disabled:text-gray-400"
+            className="w-full border border-alten-border rounded px-2 py-1.5 text-sm focus:ring-2 focus:ring-alten-blue focus:outline-none disabled:bg-alten-light disabled:text-alten-mid"
           >
             <option value="">
               {selectedProviderId ? 'Selecciona plan…' : '— elige proveedor primero —'}
@@ -123,7 +123,7 @@ function CreateAccountForm({ onClose }: CreateFormProps) {
         </div>
 
         <div className="col-span-2">
-          <label htmlFor={`${formId}-id`} className="block text-xs font-medium text-gray-600 mb-0.5">
+          <label htmlFor={`${formId}-id`} className="block text-xs font-medium text-alten-body mb-0.5">
             Identificador externo *
           </label>
           <input
@@ -132,12 +132,12 @@ function CreateAccountForm({ onClose }: CreateFormProps) {
             value={identifier}
             onChange={(e) => setIdentifier(e.target.value)}
             placeholder="ej. copilot-marta@alten.es"
-            className="w-full border border-gray-300 rounded px-2 py-1.5 text-sm focus:ring-2 focus:ring-blue-400 focus:outline-none"
+            className="w-full border border-alten-border rounded px-2 py-1.5 text-sm focus:ring-2 focus:ring-alten-blue focus:outline-none"
           />
         </div>
 
         <div>
-          <label htmlFor={`${formId}-from`} className="block text-xs font-medium text-gray-600 mb-0.5">
+          <label htmlFor={`${formId}-from`} className="block text-xs font-medium text-alten-body mb-0.5">
             Válido desde *
           </label>
           <input
@@ -146,12 +146,12 @@ function CreateAccountForm({ onClose }: CreateFormProps) {
             required
             value={validFrom}
             onChange={(e) => setValidFrom(e.target.value)}
-            className="w-full border border-gray-300 rounded px-2 py-1.5 text-sm focus:ring-2 focus:ring-blue-400 focus:outline-none"
+            className="w-full border border-alten-border rounded px-2 py-1.5 text-sm focus:ring-2 focus:ring-alten-blue focus:outline-none"
           />
         </div>
 
         <div>
-          <label htmlFor={`${formId}-to`} className="block text-xs font-medium text-gray-600 mb-0.5">
+          <label htmlFor={`${formId}-to`} className="block text-xs font-medium text-alten-body mb-0.5">
             Válido hasta
           </label>
           <input
@@ -159,25 +159,25 @@ function CreateAccountForm({ onClose }: CreateFormProps) {
             type="date"
             value={validTo}
             onChange={(e) => setValidTo(e.target.value)}
-            className="w-full border border-gray-300 rounded px-2 py-1.5 text-sm focus:ring-2 focus:ring-blue-400 focus:outline-none"
+            className="w-full border border-alten-border rounded px-2 py-1.5 text-sm focus:ring-2 focus:ring-alten-blue focus:outline-none"
           />
         </div>
       </div>
 
-      {error && <p role="alert" className="text-sm text-red-600">{error}</p>}
+      {error && <p role="alert" className="text-sm text-alten-red">{error}</p>}
 
       <div className="flex gap-2 pt-1">
         <button
           type="submit"
           disabled={createAccount.isPending}
-          className="px-4 py-1.5 text-sm font-medium text-white bg-blue-600 rounded hover:bg-blue-700 disabled:opacity-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-400"
+          className="px-4 py-1.5 text-sm font-medium text-white bg-alten-blue rounded hover:bg-alten-hover disabled:opacity-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-alten-blue"
         >
           {createAccount.isPending ? 'Guardando…' : 'Crear cuenta'}
         </button>
         <button
           type="button"
           onClick={onClose}
-          className="px-4 py-1.5 text-sm text-gray-500 border border-gray-300 rounded hover:bg-gray-50 focus:outline-none focus-visible:ring-1 focus-visible:ring-gray-300"
+          className="px-4 py-1.5 text-sm text-alten-mid border border-alten-border rounded hover:bg-alten-light focus:outline-none focus-visible:ring-1 focus-visible:ring-alten-border"
         >
           Cancelar
         </button>
@@ -195,18 +195,18 @@ function AccountRow({ account, onDelete }: { account: AiAccount; onDelete: (id: 
 
   return (
     <>
-      <tr className="hover:bg-gray-50">
-        <td className="px-4 py-3 text-sm font-mono text-gray-800 max-w-xs truncate" title={account.external_identifier}>
+      <tr className="hover:bg-alten-light">
+        <td className="px-4 py-3 text-sm font-mono text-alten-body max-w-xs truncate" title={account.external_identifier}>
           <button
             type="button"
             aria-expanded={expanded}
             aria-controls={rowId}
             onClick={() => setExpanded((v) => !v)}
-            className="flex items-center gap-1.5 text-left focus:outline-none focus-visible:ring-1 focus-visible:ring-blue-400 rounded"
+            className="flex items-center gap-1.5 text-left focus:outline-none focus-visible:ring-1 focus-visible:ring-alten-blue rounded"
           >
             <span
               aria-hidden="true"
-              className="text-gray-400 text-xs w-3 inline-block transition-transform"
+              className="text-alten-mid text-xs w-3 inline-block transition-transform"
               style={{ transform: expanded ? 'rotate(90deg)' : undefined }}
             >
               ▶
@@ -214,7 +214,7 @@ function AccountRow({ account, onDelete }: { account: AiAccount; onDelete: (id: 
             {account.external_identifier}
           </button>
         </td>
-        <td className="px-4 py-3 text-sm text-gray-600">
+        <td className="px-4 py-3 text-sm text-alten-body">
           {plan ? (
             <div className="flex items-center gap-2">
               <span className={`px-1.5 py-0.5 rounded text-xs font-medium ${PLAN_TYPE_BADGE[plan.type]}`}>
@@ -223,27 +223,27 @@ function AccountRow({ account, onDelete }: { account: AiAccount; onDelete: (id: 
               <span>{plan.name}</span>
             </div>
           ) : (
-            <span className="text-gray-400">—</span>
+            <span className="text-alten-mid">—</span>
           )}
         </td>
-        <td className="px-4 py-3 text-sm text-gray-600 text-right whitespace-nowrap">
+        <td className="px-4 py-3 text-sm text-alten-body text-right whitespace-nowrap">
           {plan?.type === 'PAY_PER_TOKEN' ? (
-            <span className="text-gray-400">variable</span>
+            <span className="text-alten-mid">variable</span>
           ) : plan ? (
             `${Number(plan.unit_price).toFixed(2)} ${plan.currency}`
           ) : (
-            <span className="text-gray-400">—</span>
+            <span className="text-alten-mid">—</span>
           )}
         </td>
-        <td className="px-4 py-3 text-sm text-gray-500 whitespace-nowrap">{account.valid_from}</td>
-        <td className="px-4 py-3 text-sm text-gray-500 whitespace-nowrap">
-          {account.valid_to ?? <span className="text-gray-400">vigente</span>}
+        <td className="px-4 py-3 text-sm text-alten-mid whitespace-nowrap">{account.valid_from}</td>
+        <td className="px-4 py-3 text-sm text-alten-mid whitespace-nowrap">
+          {account.valid_to ?? <span className="text-alten-mid">vigente</span>}
         </td>
         <td className="px-4 py-3 text-right">
           <button
             type="button"
             onClick={() => onDelete(account.id)}
-            className="text-xs text-red-400 hover:text-red-600 focus:outline-none focus-visible:ring-1 focus-visible:ring-red-400 rounded"
+            className="text-xs text-alten-red hover:text-alten-red focus:outline-none focus-visible:ring-1 focus-visible:ring-alten-red rounded"
             aria-label={`Eliminar cuenta ${account.external_identifier}`}
           >
             Eliminar
@@ -252,7 +252,7 @@ function AccountRow({ account, onDelete }: { account: AiAccount; onDelete: (id: 
       </tr>
       {expanded && (
         <tr id={rowId}>
-          <td colSpan={6} className="px-4 pb-4 bg-gray-50">
+          <td colSpan={6} className="px-4 pb-4 bg-alten-light">
             <OwnershipForm accountId={account.id} />
           </td>
         </tr>
@@ -286,7 +286,7 @@ export function AccountsPanel() {
         <button
           type="button"
           onClick={() => setShowForm((v) => !v)}
-          className="px-3 py-1.5 text-sm font-medium text-white bg-blue-600 rounded hover:bg-blue-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+          className="px-3 py-1.5 text-sm font-medium text-white bg-alten-blue rounded hover:bg-alten-hover focus:outline-none focus-visible:ring-2 focus-visible:ring-alten-blue"
         >
           {showForm ? 'Cancelar' : '+ Añadir cuenta'}
         </button>
@@ -295,39 +295,39 @@ export function AccountsPanel() {
       {showForm && <CreateAccountForm onClose={() => setShowForm(false)} />}
 
       {isLoading && (
-        <div role="status" aria-live="polite" className="py-8 text-center text-gray-500 text-sm">
+        <div role="status" aria-live="polite" className="py-8 text-center text-alten-mid text-sm">
           Cargando cuentas…
         </div>
       )}
 
       {error && (
-        <div role="alert" className="py-4 text-center text-red-600 text-sm">
+        <div role="alert" className="py-4 text-center text-alten-red text-sm">
           Error al cargar cuentas: {error.message}
         </div>
       )}
 
       {!isLoading && !error && activeAccounts.length === 0 && (
-        <p className="text-sm text-gray-400 py-4">No hay cuentas configuradas.</p>
+        <p className="text-sm text-alten-mid py-4">No hay cuentas configuradas.</p>
       )}
 
       {!isLoading && !error && activeAccounts.length > 0 && (
-        <div className="overflow-x-auto border border-gray-200 rounded-lg">
+        <div className="overflow-x-auto border border-alten-border rounded-lg">
           <table className="min-w-full divide-y divide-gray-100" role="table">
-            <thead className="bg-gray-50">
+            <thead className="bg-alten-light">
               <tr>
-                <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wide">
+                <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-alten-mid uppercase tracking-wide">
                   Identificador externo
                 </th>
-                <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wide">
+                <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-alten-mid uppercase tracking-wide">
                   Plan
                 </th>
-                <th scope="col" className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wide">
+                <th scope="col" className="px-4 py-3 text-right text-xs font-medium text-alten-mid uppercase tracking-wide">
                   Precio/unidad
                 </th>
-                <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wide">
+                <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-alten-mid uppercase tracking-wide">
                   Desde
                 </th>
-                <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wide">
+                <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-alten-mid uppercase tracking-wide">
                   Hasta
                 </th>
                 <th scope="col" className="px-4 py-3">
