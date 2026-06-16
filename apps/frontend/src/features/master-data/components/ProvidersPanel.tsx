@@ -10,15 +10,13 @@ import type { AiProvider, PlanType } from '../types.js'
 
 const PLAN_TYPES: { value: PlanType; label: string }[] = [
   { value: 'PER_SEAT', label: 'Por asiento (PER_SEAT)' },
-  { value: 'POOL_SLOT', label: 'Pool de slots (POOL_SLOT)' },
   { value: 'PAY_PER_TOKEN', label: 'Pago por token (PAY_PER_TOKEN)' },
-  { value: 'VOLUME_TIER', label: 'Tramo de volumen (VOLUME_TIER)' },
 ]
 
-const PLAN_TYPE_BADGE: Record<PlanType, string> = {
+const PLAN_TYPE_BADGE: Record<string, string> = {
   PER_SEAT: 'bg-alten-pale text-alten-blue',
-  POOL_SLOT: 'bg-purple-100 text-purple-700',
   PAY_PER_TOKEN: 'bg-orange-100 text-orange-700',
+  POOL_SLOT: 'bg-purple-100 text-purple-700',
   VOLUME_TIER: 'bg-teal-100 text-teal-700',
 }
 
@@ -32,9 +30,19 @@ function PlansList({ provider }: { provider: AiProvider }) {
   const [planName, setPlanName] = useState('')
   const [planType, setPlanType] = useState<PlanType>('PER_SEAT')
   const [unitPrice, setUnitPrice] = useState('')
+  const [priceInput, setPriceInput] = useState('')
+  const [priceOutput, setPriceOutput] = useState('')
   const [currency, setCurrency] = useState('EUR')
   const [effectiveFrom, setEffectiveFrom] = useState('')
+  const [contractedAt, setContractedAt] = useState('')
+  const [activatedAt, setActivatedAt] = useState('')
   const [error, setError] = useState<string | null>(null)
+
+  function resetForm() {
+    setPlanName(''); setPlanType('PER_SEAT'); setUnitPrice(''); setPriceInput('')
+    setPriceOutput(''); setEffectiveFrom(''); setContractedAt(''); setActivatedAt('')
+    setShowForm(false)
+  }
 
   async function handleAddPlan(e: React.FormEvent) {
     e.preventDefault()
@@ -44,18 +52,21 @@ function PlansList({ provider }: { provider: AiProvider }) {
         providerId: provider.id,
         type: planType,
         name: planName,
-        ...(unitPrice ? { unit_price: Number(unitPrice) } : {}),
         currency,
         effective_from: effectiveFrom,
+        ...(planType === 'PER_SEAT' && unitPrice ? { unit_price: Number(unitPrice) } : {}),
+        ...(planType === 'PAY_PER_TOKEN' && priceInput ? { price_per_input_token: Number(priceInput) } : {}),
+        ...(planType === 'PAY_PER_TOKEN' && priceOutput ? { price_per_output_token: Number(priceOutput) } : {}),
+        ...(contractedAt ? { contracted_at: contractedAt } : {}),
+        ...(activatedAt ? { activated_at: activatedAt } : {}),
       })
-      setPlanName('')
-      setUnitPrice('')
-      setEffectiveFrom('')
-      setShowForm(false)
+      resetForm()
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error al guardar')
     }
   }
+
+  const fc = 'w-full border border-alten-border rounded px-2 py-1 text-xs focus:ring-1 focus:ring-alten-blue focus:outline-none'
 
   return (
     <div className="mt-3 pl-4 border-l-2 border-alten-light">
@@ -71,8 +82,9 @@ function PlansList({ provider }: { provider: AiProvider }) {
             <tr className="text-alten-mid">
               <th scope="col" className="text-left pr-4 py-1 font-medium">Nombre</th>
               <th scope="col" className="text-left pr-4 py-1 font-medium">Tipo</th>
-              <th scope="col" className="text-right pr-4 py-1 font-medium">Precio/unidad</th>
-              <th scope="col" className="text-left py-1 font-medium">Vigencia desde</th>
+              <th scope="col" className="text-right pr-4 py-1 font-medium">Precio</th>
+              <th scope="col" className="text-left pr-4 py-1 font-medium">Contratación</th>
+              <th scope="col" className="text-left py-1 font-medium">Activación</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-50">
@@ -80,16 +92,24 @@ function PlansList({ provider }: { provider: AiProvider }) {
               <tr key={plan.id}>
                 <td className="pr-4 py-1.5 text-alten-body font-medium">{plan.name}</td>
                 <td className="pr-4 py-1.5">
-                  <span className={`px-1.5 py-0.5 rounded text-xs font-medium ${PLAN_TYPE_BADGE[plan.type]}`}>
+                  <span className={`px-1.5 py-0.5 rounded text-xs font-medium ${PLAN_TYPE_BADGE[plan.type] ?? 'bg-gray-100 text-gray-700'}`}>
                     {plan.type}
                   </span>
                 </td>
                 <td className="pr-4 py-1.5 text-right text-alten-body">
-                  {plan.type === 'PAY_PER_TOKEN'
-                    ? 'variable'
-                    : `${Number(plan.unit_price).toFixed(2)} ${plan.currency}`}
+                  {plan.type === 'PAY_PER_TOKEN' ? (
+                    <span className="text-alten-mid">
+                      {plan.price_per_input_token ? `${Number(plan.price_per_input_token).toFixed(4)}/Mtok↑` : ''}
+                      {plan.price_per_input_token && plan.price_per_output_token ? ' · ' : ''}
+                      {plan.price_per_output_token ? `${Number(plan.price_per_output_token).toFixed(4)}/Mtok↓` : ''}
+                      {!plan.price_per_input_token && !plan.price_per_output_token ? 'variable' : ''}
+                    </span>
+                  ) : (
+                    `${Number(plan.unit_price).toFixed(2)} ${plan.currency}`
+                  )}
                 </td>
-                <td className="py-1.5 text-alten-mid">{plan.effective_from}</td>
+                <td className="pr-4 py-1.5 text-alten-mid">{plan.contracted_at ?? '—'}</td>
+                <td className="py-1.5 text-alten-mid">{plan.activated_at ?? plan.effective_from}</td>
               </tr>
             ))}
           </tbody>
@@ -105,8 +125,9 @@ function PlansList({ provider }: { provider: AiProvider }) {
           + Añadir plan
         </button>
       ) : (
-        <form id={`${formId}-plan`} onSubmit={handleAddPlan} className="mt-2 space-y-2 max-w-lg">
+        <form id={`${formId}-plan`} onSubmit={handleAddPlan} className="mt-2 space-y-3 max-w-lg">
           <div className="grid grid-cols-2 gap-2">
+            {/* Nombre */}
             <div className="col-span-2">
               <label htmlFor={`${formId}-pname`} className="block text-xs font-medium text-alten-body mb-0.5">
                 Nombre del plan *
@@ -117,9 +138,11 @@ function PlansList({ provider }: { provider: AiProvider }) {
                 value={planName}
                 onChange={(e) => setPlanName(e.target.value)}
                 placeholder="ej. GPT-4o API"
-                className="w-full border border-alten-border rounded px-2 py-1 text-xs focus:ring-1 focus:ring-alten-blue focus:outline-none"
+                className={fc}
               />
             </div>
+
+            {/* Tipo */}
             <div>
               <label htmlFor={`${formId}-ptype`} className="block text-xs font-medium text-alten-body mb-0.5">
                 Tipo *
@@ -128,13 +151,86 @@ function PlansList({ provider }: { provider: AiProvider }) {
                 id={`${formId}-ptype`}
                 value={planType}
                 onChange={(e) => setPlanType(e.target.value as PlanType)}
-                className="w-full border border-alten-border rounded px-2 py-1 text-xs focus:ring-1 focus:ring-alten-blue focus:outline-none"
+                className={fc}
               >
                 {PLAN_TYPES.map((t) => (
                   <option key={t.value} value={t.value}>{t.label}</option>
                 ))}
               </select>
             </div>
+
+            {/* Moneda */}
+            <div>
+              <label htmlFor={`${formId}-pcur`} className="block text-xs font-medium text-alten-body mb-0.5">
+                Moneda
+              </label>
+              <select
+                id={`${formId}-pcur`}
+                value={currency}
+                onChange={(e) => setCurrency(e.target.value)}
+                className={fc}
+              >
+                <option value="EUR">EUR</option>
+                <option value="USD">USD</option>
+              </select>
+            </div>
+
+            {/* Precio por asiento (solo PER_SEAT) */}
+            {planType === 'PER_SEAT' && (
+              <div className="col-span-2">
+                <label htmlFor={`${formId}-pprice`} className="block text-xs font-medium text-alten-body mb-0.5">
+                  Precio/asiento mensual
+                </label>
+                <input
+                  id={`${formId}-pprice`}
+                  type="number"
+                  min={0}
+                  step="0.01"
+                  value={unitPrice}
+                  onChange={(e) => setUnitPrice(e.target.value)}
+                  placeholder="0.00"
+                  className={fc}
+                />
+              </div>
+            )}
+
+            {/* Precios por token (solo PAY_PER_TOKEN) */}
+            {planType === 'PAY_PER_TOKEN' && (
+              <>
+                <div>
+                  <label htmlFor={`${formId}-pinput`} className="block text-xs font-medium text-alten-body mb-0.5">
+                    Precio token entrada <span className="text-alten-mid">(por millón)</span>
+                  </label>
+                  <input
+                    id={`${formId}-pinput`}
+                    type="number"
+                    min={0}
+                    step="0.0001"
+                    value={priceInput}
+                    onChange={(e) => setPriceInput(e.target.value)}
+                    placeholder="0.0000"
+                    className={fc}
+                  />
+                </div>
+                <div>
+                  <label htmlFor={`${formId}-poutput`} className="block text-xs font-medium text-alten-body mb-0.5">
+                    Precio token salida <span className="text-alten-mid">(por millón)</span>
+                  </label>
+                  <input
+                    id={`${formId}-poutput`}
+                    type="number"
+                    min={0}
+                    step="0.0001"
+                    value={priceOutput}
+                    onChange={(e) => setPriceOutput(e.target.value)}
+                    placeholder="0.0000"
+                    className={fc}
+                  />
+                </div>
+              </>
+            )}
+
+            {/* Vigencia desde */}
             <div>
               <label htmlFor={`${formId}-pfrom`} className="block text-xs font-medium text-alten-body mb-0.5">
                 Vigencia desde *
@@ -145,41 +241,37 @@ function PlansList({ provider }: { provider: AiProvider }) {
                 required
                 value={effectiveFrom}
                 onChange={(e) => setEffectiveFrom(e.target.value)}
-                className="w-full border border-alten-border rounded px-2 py-1 text-xs focus:ring-1 focus:ring-alten-blue focus:outline-none"
+                className={fc}
               />
             </div>
-            {planType !== 'PAY_PER_TOKEN' && (
-              <>
-                <div>
-                  <label htmlFor={`${formId}-pprice`} className="block text-xs font-medium text-alten-body mb-0.5">
-                    Precio/unidad
-                  </label>
-                  <input
-                    id={`${formId}-pprice`}
-                    type="number"
-                    min={0}
-                    step="0.01"
-                    value={unitPrice}
-                    onChange={(e) => setUnitPrice(e.target.value)}
-                    className="w-full border border-alten-border rounded px-2 py-1 text-xs focus:ring-1 focus:ring-alten-blue focus:outline-none"
-                  />
-                </div>
-                <div>
-                  <label htmlFor={`${formId}-pcur`} className="block text-xs font-medium text-alten-body mb-0.5">
-                    Moneda
-                  </label>
-                  <select
-                    id={`${formId}-pcur`}
-                    value={currency}
-                    onChange={(e) => setCurrency(e.target.value)}
-                    className="w-full border border-alten-border rounded px-2 py-1 text-xs focus:ring-1 focus:ring-alten-blue focus:outline-none"
-                  >
-                    <option value="EUR">EUR</option>
-                    <option value="USD">USD</option>
-                  </select>
-                </div>
-              </>
-            )}
+
+            {/* Fecha contratación */}
+            <div>
+              <label htmlFor={`${formId}-contracted`} className="block text-xs font-medium text-alten-body mb-0.5">
+                Fecha de contratación
+              </label>
+              <input
+                id={`${formId}-contracted`}
+                type="date"
+                value={contractedAt}
+                onChange={(e) => setContractedAt(e.target.value)}
+                className={fc}
+              />
+            </div>
+
+            {/* Fecha activación */}
+            <div>
+              <label htmlFor={`${formId}-activated`} className="block text-xs font-medium text-alten-body mb-0.5">
+                Fecha de activación
+              </label>
+              <input
+                id={`${formId}-activated`}
+                type="date"
+                value={activatedAt}
+                onChange={(e) => setActivatedAt(e.target.value)}
+                className={fc}
+              />
+            </div>
           </div>
 
           {error && <p role="alert" className="text-xs text-alten-red">{error}</p>}
@@ -194,7 +286,7 @@ function PlansList({ provider }: { provider: AiProvider }) {
             </button>
             <button
               type="button"
-              onClick={() => setShowForm(false)}
+              onClick={resetForm}
               className="px-3 py-1 text-xs text-alten-mid border border-alten-border rounded hover:bg-alten-light focus:outline-none focus-visible:ring-1 focus-visible:ring-alten-border"
             >
               Cancelar

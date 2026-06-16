@@ -1,8 +1,17 @@
 import type { Project, Person, AiProvider, PricingPlan, AiAccount } from '../features/master-data/types.js'
 import type { BudgetSummary } from '../features/budgets/types.js'
 
+const nullProjectExtras = {
+  delivery_manager_id: null,
+  project_leader_id: null,
+  project_leader_2_id: null,
+  total_budget: null,
+  iqp: null,
+} satisfies Pick<Project, 'delivery_manager_id' | 'project_leader_id' | 'project_leader_2_id' | 'total_budget' | 'iqp'>
+
 export const DEMO_PROJECTS: Project[] = [
   {
+    ...nullProjectExtras,
     id: 'proj-001',
     code: 'ALT-2024-001',
     name: 'Transformación Digital Bancaria',
@@ -15,6 +24,7 @@ export const DEMO_PROJECTS: Project[] = [
     deleted_at: null,
   },
   {
+    ...nullProjectExtras,
     id: 'proj-002',
     code: 'ALT-2024-002',
     name: 'IA Generativa en Atención al Cliente',
@@ -27,6 +37,7 @@ export const DEMO_PROJECTS: Project[] = [
     deleted_at: null,
   },
   {
+    ...nullProjectExtras,
     id: 'proj-003',
     code: 'ALT-2024-003',
     name: 'Automatización de Procesos RPA',
@@ -39,6 +50,7 @@ export const DEMO_PROJECTS: Project[] = [
     deleted_at: null,
   },
   {
+    ...nullProjectExtras,
     id: 'proj-004',
     code: 'ALT-2025-001',
     name: 'Plataforma MLOps Corporativa',
@@ -51,6 +63,7 @@ export const DEMO_PROJECTS: Project[] = [
     deleted_at: null,
   },
   {
+    ...nullProjectExtras,
     id: 'proj-005',
     code: 'ALT-2023-008',
     name: 'Análisis Predictivo de Riesgos',
@@ -124,28 +137,40 @@ export const DEMO_PROVIDERS: AiProvider[] = [
   { id: 'prov-006', name: 'xAI (Grok)', created_at: '2024-06-01T00:00:00Z', deleted_at: null },
 ]
 
+const nullPlanExtras = {
+  price_per_input_token: null,
+  price_per_output_token: null,
+  contracted_at: null,
+  activated_at: null,
+} satisfies Pick<PricingPlan, 'price_per_input_token' | 'price_per_output_token' | 'contracted_at' | 'activated_at'>
+
 export const DEMO_PLANS: PricingPlan[] = [
   {
+    ...nullPlanExtras,
     id: 'plan-001', provider_id: 'prov-001', type: 'PAY_PER_TOKEN',
     name: 'Claude Sonnet API', unit_price: '0.0000', currency: 'USD',
     effective_from: '2024-01-01', effective_to: null, deleted_at: null,
   },
   {
+    ...nullPlanExtras,
     id: 'plan-002', provider_id: 'prov-002', type: 'PAY_PER_TOKEN',
     name: 'GPT-4o API', unit_price: '0.0000', currency: 'USD',
     effective_from: '2024-05-01', effective_to: null, deleted_at: null,
   },
   {
+    ...nullPlanExtras,
     id: 'plan-003', provider_id: 'prov-003', type: 'PER_SEAT',
     name: 'GitHub Copilot Business', unit_price: '19.0000', currency: 'USD',
     effective_from: '2024-01-01', effective_to: null, deleted_at: null,
   },
   {
+    ...nullPlanExtras,
     id: 'plan-004', provider_id: 'prov-003', type: 'PER_SEAT',
     name: 'Microsoft 365 Copilot', unit_price: '30.0000', currency: 'USD',
     effective_from: '2024-03-01', effective_to: null, deleted_at: null,
   },
   {
+    ...nullPlanExtras,
     id: 'plan-005', provider_id: 'prov-005', type: 'POOL_SLOT',
     name: 'Mistral La Plateforme Team', unit_price: '50.0000', currency: 'EUR',
     effective_from: '2024-06-01', effective_to: null, deleted_at: null,

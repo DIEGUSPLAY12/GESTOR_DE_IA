@@ -17,7 +17,7 @@ async function resolvePersonId(req: AuthenticatedRequest): Promise<string | null
 }
 
 const DATE_RE = /^\d{4}-(0[1-9]|1[0-2])-([0-2]\d|3[01])$/
-const PLAN_TYPES = ['PER_SEAT', 'POOL_SLOT', 'PAY_PER_TOKEN', 'VOLUME_TIER'] as const
+const PLAN_TYPES = ['PER_SEAT', 'PAY_PER_TOKEN'] as const
 const CURRENCY_RE = /^[A-Z]{3}$/
 
 function isValidDate(s: unknown): s is string {
@@ -100,7 +100,10 @@ providersRouter.post('/:id/plans', requireAuth, requireRole('ADMIN'), async (req
   try {
     const { id: provider_id } = req.params as { id: string }
     const body = req.body as Record<string, unknown>
-    const { type, name, unit_price, currency, effective_from, effective_to } = body
+    const {
+      type, name, unit_price, currency, effective_from, effective_to,
+      price_per_input_token, price_per_output_token, contracted_at, activated_at,
+    } = body
 
     if (
       !PLAN_TYPES.includes(type as (typeof PLAN_TYPES)[number]) ||
@@ -129,6 +132,10 @@ providersRouter.post('/:id/plans', requireAuth, requireRole('ADMIN'), async (req
         currency: currency_val,
         effective_from,
         ...(isValidDate(effective_to) ? { effective_to } : {}),
+        ...(typeof price_per_input_token === 'number' ? { price_per_input_token } : {}),
+        ...(typeof price_per_output_token === 'number' ? { price_per_output_token } : {}),
+        ...(isValidDate(contracted_at) ? { contracted_at } : {}),
+        ...(isValidDate(activated_at) ? { activated_at } : {}),
       })
       .select()
       .single()

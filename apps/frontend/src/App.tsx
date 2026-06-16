@@ -202,12 +202,6 @@ function Sidebar({ isAdmin, hasPerson }: SidebarProps) {
             {icons.budgets}
             <span>Presupuestos</span>
           </NavLink>
-          {!isAdmin && (
-            <NavLink to="/consultant" className={itemClass}>
-              {icons.consumption}
-              <span>Mi consumo</span>
-            </NavLink>
-          )}
           {showAdmin && (
             <NavLink to="/reports" className={itemClass}>
               {icons.reports}

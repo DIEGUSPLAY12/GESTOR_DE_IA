@@ -216,11 +216,16 @@ projectsRouter.get('/', requireAuth, async (req, res, next) => {
   }
 })
 
+const IQP_VALUES = ['3.1', '3.2', '4', '5'] as const
+
 // POST /api/v1/projects
 projectsRouter.post('/', requireAuth, requireRole('ADMIN'), async (req, res, next) => {
   try {
     const body = req.body as Record<string, unknown>
-    const { code, name, client_name, project_manager_id, start_date, end_date, monthly_budget } = body
+    const {
+      code, name, client_name, project_manager_id, start_date, end_date, monthly_budget,
+      iqp, delivery_manager_id, project_leader_id, project_leader_2_id, total_budget,
+    } = body
 
     if (
       typeof code !== 'string' ||
@@ -235,6 +240,11 @@ projectsRouter.post('/', requireAuth, requireRole('ADMIN'), async (req, res, nex
       return
     }
 
+    if (iqp !== undefined && !IQP_VALUES.includes(iqp as (typeof IQP_VALUES)[number])) {
+      res.status(400).json({ error: `iqp must be one of: ${IQP_VALUES.join(', ')}` })
+      return
+    }
+
     const { data, error } = await supabase
       .from('project')
       .insert({
@@ -245,6 +255,11 @@ projectsRouter.post('/', requireAuth, requireRole('ADMIN'), async (req, res, nex
         start_date,
         ...(typeof end_date === 'string' ? { end_date } : {}),
         ...(monthly_budget !== undefined ? { monthly_budget } : {}),
+        ...(total_budget !== undefined ? { total_budget } : {}),
+        ...(typeof iqp === 'string' ? { iqp } : {}),
+        ...(typeof delivery_manager_id === 'string' ? { delivery_manager_id } : {}),
+        ...(typeof project_leader_id === 'string' ? { project_leader_id } : {}),
+        ...(typeof project_leader_2_id === 'string' ? { project_leader_2_id } : {}),
       })
       .select()
       .single()
@@ -268,7 +283,10 @@ projectsRouter.patch('/:id', requireAuth, requireRole('ADMIN'), async (req, res,
   try {
     const { id } = req.params as { id: string }
     const body = req.body as Record<string, unknown>
-    const allowed = ['name', 'client_name', 'project_manager_id', 'start_date', 'end_date', 'monthly_budget']
+    const allowed = [
+      'name', 'client_name', 'project_manager_id', 'start_date', 'end_date', 'monthly_budget',
+      'total_budget', 'iqp', 'delivery_manager_id', 'project_leader_id', 'project_leader_2_id',
+    ]
     const updates: Record<string, unknown> = {}
 
     for (const field of allowed) {
@@ -650,6 +668,94 @@ projectsRouter.delete('/:projectId/usage/:usageId', requireAuth, async (req: Aut
 
     if (error) throw new Error(error.message)
     res.json({ message: 'Registro de uso eliminado' })
+  } catch (err) {
+    next(err)
+  }
+})
+
+// GET /api/v1/projects/:projectId/ai-accounts
+// Returns AI accounts used in a project, with total cost and per-period breakdown
+projectsRouter.get('/:projectId/ai-accounts', requireAuth, async (req: AuthenticatedRequest, res, next) => {
+  try {
+    const { projectId } = req.params as { projectId: string }
+
+    const { data, error } = await supabase
+      .from('usage_log')
+      .select(`
+        account_id,
+        calculated_cost,
+        currency,
+        period_month,
+        account:account_id (
+          external_identifier,
+          valid_from,
+          valid_to,
+          pricing_plan:pricing_plan_id (
+            name,
+            type,
+            provider:provider_id ( name )
+          )
+        )
+      `)
+      .eq('project_id', projectId)
+      .order('period_month', { ascending: true })
+
+    if (error) throw new Error(error.message)
+
+    type AccountJoin = {
+      external_identifier: string
+      valid_from: string
+      valid_to: string | null
+      pricing_plan: { name: string; type: string; provider: { name: string } | null } | null
+    } | null
+
+    const accountMap = new Map<string, {
+      account_id: string
+      identifier: string
+      provider_name: string
+      plan_name: string
+      plan_type: string
+      total_cost: number
+      currency: string
+      valid_from: string
+      valid_to: string | null
+      by_period: { period_month: string; cost: number }[]
+    }>()
+
+    for (const row of (data ?? [])) {
+      const acc = (row.account as unknown) as AccountJoin
+      const plan = acc?.pricing_plan
+      const id = row.account_id as string
+      const cost = Number(row.calculated_cost)
+      const period = row.period_month as string
+
+      if (!accountMap.has(id)) {
+        accountMap.set(id, {
+          account_id: id,
+          identifier: acc?.external_identifier ?? id,
+          provider_name: plan?.provider?.name ?? '—',
+          plan_name: plan?.name ?? '—',
+          plan_type: plan?.type ?? '—',
+          total_cost: 0,
+          currency: row.currency as string,
+          valid_from: acc?.valid_from ?? '',
+          valid_to: acc?.valid_to ?? null,
+          by_period: [],
+        })
+      }
+
+      const entry = accountMap.get(id)!
+      entry.total_cost = Math.round((entry.total_cost + cost) * 10000) / 10000
+
+      const periodEntry = entry.by_period.find((p) => p.period_month === period)
+      if (periodEntry) {
+        periodEntry.cost = Math.round((periodEntry.cost + cost) * 10000) / 10000
+      } else {
+        entry.by_period.push({ period_month: period, cost })
+      }
+    }
+
+    res.json({ data: Array.from(accountMap.values()) })
   } catch (err) {
     next(err)
   }

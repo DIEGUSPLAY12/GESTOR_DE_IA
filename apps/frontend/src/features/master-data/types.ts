@@ -1,5 +1,7 @@
 export type PersonRole = 'ADMIN' | 'PROJECT_MANAGER' | 'CONSULTANT'
-export type PlanType = 'PER_SEAT' | 'POOL_SLOT' | 'PAY_PER_TOKEN' | 'VOLUME_TIER'
+export type PlanType = 'PER_SEAT' | 'PAY_PER_TOKEN' | 'POOL_SLOT' | 'VOLUME_TIER'
+export type IqpValue = '3.1' | '3.2' | '4' | '5'
+export const IQP_OPTIONS: IqpValue[] = ['3.1', '3.2', '4', '5']
 
 export interface Person {
   id: string
@@ -16,9 +18,14 @@ export interface Project {
   name: string
   client_name: string
   project_manager_id: string
+  delivery_manager_id: string | null
+  project_leader_id: string | null
+  project_leader_2_id: string | null
   start_date: string
   end_date: string | null
   monthly_budget: string | null
+  total_budget: string | null
+  iqp: IqpValue | null
   created_at: string
   deleted_at: string | null
 }
@@ -39,6 +46,10 @@ export interface PricingPlan {
   currency: string
   effective_from: string
   effective_to: string | null
+  price_per_input_token: string | null
+  price_per_output_token: string | null
+  contracted_at: string | null
+  activated_at: string | null
   deleted_at: string | null
 }
 
@@ -111,18 +122,28 @@ export interface CreateProjectInput {
   name: string
   client_name: string
   project_manager_id: string
+  delivery_manager_id?: string
+  project_leader_id?: string
+  project_leader_2_id?: string
   start_date: string
   end_date?: string
   monthly_budget?: number
+  total_budget?: number
+  iqp?: IqpValue
 }
 
 export interface UpdateProjectInput {
   name?: string
   client_name?: string
   project_manager_id?: string
+  delivery_manager_id?: string
+  project_leader_id?: string
+  project_leader_2_id?: string
   start_date?: string
   end_date?: string
   monthly_budget?: number
+  total_budget?: number
+  iqp?: IqpValue
 }
 
 export interface CreateAccountInput {
@@ -156,6 +177,23 @@ export interface CreatePlanInput {
   currency?: string
   effective_from: string
   effective_to?: string
+  price_per_input_token?: number
+  price_per_output_token?: number
+  contracted_at?: string
+  activated_at?: string
+}
+
+export interface ProjectAiAccount {
+  account_id: string
+  identifier: string
+  provider_name: string
+  plan_name: string
+  plan_type: string
+  total_cost: number
+  currency: string
+  valid_from: string
+  valid_to: string | null
+  by_period: { period_month: string; cost: number }[]
 }
 
 export interface DeleteAccountInput {

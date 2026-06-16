@@ -16,6 +16,7 @@ import type {
   PricingPlan,
   Project,
   ProjectAssignment,
+  ProjectAiAccount,
   ProjectUsageEntry,
   AddProjectUsageInput,
   UpdateProjectUsageInput,
@@ -36,6 +37,7 @@ export const KEYS = {
   personAssignments: (personId: string) => ['people', personId, 'assignments'] as const,
   projectAssignment: (projectId: string) => ['projects', projectId, 'my-assignment'] as const,
   projectUsage: (projectId: string) => ['projects', projectId, 'usage'] as const,
+  projectAiAccounts: (projectId: string) => ['projects', projectId, 'ai-accounts'] as const,
 }
 
 // ─── People ───────────────────────────────────────────────────────────────────
@@ -345,5 +347,16 @@ export function useDeleteProjectUsage() {
       void qc.invalidateQueries({ queryKey: KEYS.projectUsage(vars.projectId) })
       void qc.invalidateQueries({ queryKey: ['budgets'] })
     },
+  })
+}
+
+export function useProjectAiAccounts(projectId: string) {
+  return useQuery({
+    queryKey: KEYS.projectAiAccounts(projectId),
+    queryFn: () =>
+      api
+        .get<{ data: ProjectAiAccount[] }>(`/projects/${projectId}/ai-accounts`)
+        .then((r) => r.data),
+    enabled: Boolean(projectId),
   })
 }
