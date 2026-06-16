@@ -1,7 +1,7 @@
 import { Router } from 'express'
 import type { Response, NextFunction } from 'express'
 import { supabase } from '../../lib/supabase.js'
-import { requireAuth } from '../../middleware/auth.js'
+import { requireAuth, requireRole } from '../../middleware/auth.js'
 import type { AuthenticatedRequest } from '../../middleware/auth.js'
 
 const PERIOD_RE = /^\d{4}-(0[1-9]|1[0-2])$/
@@ -45,7 +45,7 @@ interface LogUsageBody {
   period_month: string
 }
 
-router.post('/', requireAuth, async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+router.post('/', requireAuth, requireRole('ADMIN'), async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
   try {
     const {
       account_id,

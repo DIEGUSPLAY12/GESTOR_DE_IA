@@ -21,11 +21,33 @@ function LoadingFallback() {
   )
 }
 
+// ─── Auth guard ───────────────────────────────────────────────────────────────
+
 function ProtectedRoute() {
   const { session, isInitialized } = useAuth()
   if (!isInitialized) return <LoadingFallback />
   if (!session) return <Navigate to="/login" replace />
   return <Outlet />
+}
+
+// ─── Admin-only guard: redirects standard users to /dashboard with message ───
+
+function RequireAdmin() {
+  const { isAdmin, isLoading } = useCurrentUser()
+  if (isLoading) return <LoadingFallback />
+  if (!isAdmin) return <Navigate to="/dashboard" state={{ accessDenied: true }} replace />
+  return <Outlet />
+}
+
+// ─── Index redirect based on role ────────────────────────────────────────────
+
+function RoleBasedIndex() {
+  const { isAdmin, person, isLoading } = useCurrentUser()
+  if (isLoading) return <LoadingFallback />
+  if (isAdmin) return <Navigate to="/budgets" replace />
+  if (person) return <Navigate to="/dashboard" replace />
+  // Fallback while person record loads
+  return <Navigate to="/dashboard" replace />
 }
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
@@ -52,19 +74,14 @@ const icons = {
       <path strokeLinecap="round" strokeLinejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 0 1 3 19.875v-6.75ZM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V8.625ZM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V4.125Z" />
     </svg>
   ),
-  consumption: (
-    <svg className="h-4 w-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.75} aria-hidden="true">
-      <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 3v1.5M4.5 8.25H3m18 0h-1.5M4.5 12H3m18 0h-1.5m-15 3.75H3m18 0h-1.5M8.25 19.5V21M12 3v1.5m0 15V21m3.75-18v1.5m0 15V21m-9-1.5h10.5a2.25 2.25 0 0 0 2.25-2.25V6.75a2.25 2.25 0 0 0-2.25-2.25H6.75A2.25 2.25 0 0 0 4.5 6.75v10.5a2.25 2.25 0 0 0 2.25 2.25Zm.75-12h9v9h-9v-9Z" />
-    </svg>
-  ),
   reports: (
     <svg className="h-4 w-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.75} aria-hidden="true">
       <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" />
     </svg>
   ),
-  myArea: (
+  myProjects: (
     <svg className="h-4 w-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.75} aria-hidden="true">
-      <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
+      <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 12.75V12A2.25 2.25 0 0 1 4.5 9.75h15A2.25 2.25 0 0 1 21.75 12v.75m-8.69-6.44-2.12-2.12a1.5 1.5 0 0 0-1.061-.44H4.5A2.25 2.25 0 0 0 2.25 6v8.25m19.5 0v.75A2.25 2.25 0 0 1 19.5 17.25h-15A2.25 2.25 0 0 1 2.25 15.75V15" />
     </svg>
   ),
 }
@@ -102,9 +119,7 @@ function Header() {
       className="fixed top-0 left-0 right-0 z-40 flex items-center justify-between px-6 bg-alten-dark border-b-[3px] border-alten-blue"
       style={{ height: 64, boxShadow: '0 2px 8px rgba(0,0,0,0.15)' }}
     >
-      {/* Logo */}
       <div className="flex items-center gap-3">
-        {/* Replace with: <img src="/alten-logo-white.svg" alt="ALTEN" className="h-7 w-auto" /> */}
         <svg viewBox="0 0 118 30" className="h-6 w-auto" fill="none" aria-label="ALTEN">
           <text x="0" y="24" fontFamily="'Inter','Segoe UI',Arial,sans-serif" fontSize="26" fontWeight="800" fill="#FFFFFF" letterSpacing="1">ALTEN</text>
         </svg>
@@ -113,7 +128,6 @@ function Header() {
         </span>
       </div>
 
-      {/* Right: avatar + dropdown */}
       <div className="relative" ref={dropdownRef}>
         <button
           type="button"
@@ -122,7 +136,6 @@ function Header() {
           aria-haspopup="true"
           aria-expanded={dropdownOpen}
         >
-          {/* Avatar con iniciales */}
           <span
             className="flex items-center justify-center rounded-full flex-shrink-0 font-bold text-white"
             style={{ width: 36, height: 36, fontSize: 13, backgroundColor: '#008BD2' }}
@@ -165,16 +178,9 @@ function Header() {
   )
 }
 
-// ─── Sidebar (240px fijo) ─────────────────────────────────────────────────────
+// ─── Sidebar ──────────────────────────────────────────────────────────────────
 
-interface SidebarProps {
-  isAdmin: boolean
-  hasPerson: boolean
-}
-
-function Sidebar({ isAdmin, hasPerson }: SidebarProps) {
-  const showAdmin = isAdmin || !hasPerson
-
+function Sidebar({ isAdmin }: { isAdmin: boolean }) {
   function itemClass({ isActive }: { isActive: boolean }) {
     return isActive ? 'sidebar-item-active' : 'sidebar-item'
   }
@@ -186,38 +192,35 @@ function Sidebar({ isAdmin, hasPerson }: SidebarProps) {
       aria-label="Navegación principal"
     >
       <nav className="flex-1 px-3 py-5">
-        {/* Label de sección */}
         <p className="px-5 mb-2" style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.8px', textTransform: 'uppercase', color: 'rgba(255,255,255,0.4)' }}>
           Navegación
         </p>
 
         <div className="space-y-1">
-          {showAdmin && (
-            <NavLink to="/master-data" className={itemClass}>
-              {icons.masterData}
-              <span>Datos maestros</span>
-            </NavLink>
-          )}
-          <NavLink to="/budgets" className={itemClass}>
-            {icons.budgets}
-            <span>Presupuestos</span>
-          </NavLink>
-          {showAdmin && (
-            <NavLink to="/reports" className={itemClass}>
-              {icons.reports}
-              <span>Informes</span>
-            </NavLink>
-          )}
-          {!isAdmin && hasPerson && (
+          {isAdmin ? (
+            <>
+              <NavLink to="/master-data" className={itemClass}>
+                {icons.masterData}
+                <span>Datos maestros</span>
+              </NavLink>
+              <NavLink to="/budgets" className={itemClass}>
+                {icons.budgets}
+                <span>Presupuestos</span>
+              </NavLink>
+              <NavLink to="/reports" className={itemClass}>
+                {icons.reports}
+                <span>Informes</span>
+              </NavLink>
+            </>
+          ) : (
             <NavLink to="/dashboard" className={itemClass}>
-              {icons.myArea}
-              <span>Mi área</span>
+              {icons.myProjects}
+              <span>Mis Proyectos</span>
             </NavLink>
           )}
         </div>
       </nav>
 
-      {/* Footer del sidebar */}
       <div className="px-5 py-4 border-t border-white/10">
         <p style={{ fontSize: 11, fontWeight: 500, color: 'rgba(255,255,255,0.45)', letterSpacing: '0.3px' }}>
           Gestor de IA — ALTEN España
@@ -235,7 +238,7 @@ function AppLayout() {
   return (
     <div className="min-h-screen bg-alten-surface">
       <Header />
-      <Sidebar isAdmin={isAdmin} hasPerson={Boolean(person)} />
+      <Sidebar isAdmin={isAdmin} />
       <main
         id="main-content"
         className="min-h-screen"
@@ -264,14 +267,21 @@ export default function App() {
         {/* Protected */}
         <Route element={<ProtectedRoute />}>
           <Route element={<AppLayout />}>
-            <Route index                        element={<BudgetsPage />} />
-            <Route path="/master-data/*"        element={<MasterDataPage />} />
-            <Route path="/budgets"              element={<BudgetsPage />} />
-            <Route path="/consultant"           element={<ConsultantPage />} />
-            <Route path="/reports"              element={<ReportsPage />} />
+            {/* Role-based index */}
+            <Route index element={<RoleBasedIndex />} />
+
+            {/* Standard user routes */}
             <Route path="/dashboard"            element={<UserDashboard />} />
             <Route path="/projects/:projectId"  element={<ProjectDetailPage />} />
             <Route path="/profile"              element={<ProfilePage />} />
+
+            {/* Admin-only routes */}
+            <Route element={<RequireAdmin />}>
+              <Route path="/master-data/*" element={<MasterDataPage />} />
+              <Route path="/budgets"       element={<BudgetsPage />} />
+              <Route path="/reports"       element={<ReportsPage />} />
+              <Route path="/consultant"    element={<ConsultantPage />} />
+            </Route>
           </Route>
         </Route>
 

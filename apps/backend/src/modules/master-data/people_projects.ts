@@ -1,4 +1,5 @@
 import { Router } from 'express'
+import type { Response } from 'express'
 import { supabase } from '../../lib/supabase.js'
 import { requireAuth, requireRole } from '../../middleware/auth.js'
 import type { AuthenticatedRequest } from '../../middleware/auth.js'
@@ -11,6 +12,37 @@ async function resolvePersonByEmail(email: string): Promise<string | null> {
     .is('deleted_at', null)
     .maybeSingle()
   return data ? (data as { id: string }).id : null
+}
+
+// Returns true if the user is an admin or has an active assignment to the project.
+// Writes 403 to res and returns false when access is denied.
+async function verifyProjectAccess(
+  req: AuthenticatedRequest,
+  res: Response,
+  projectId: string,
+): Promise<boolean> {
+  if (req.user?.roles?.includes('ADMIN')) return true
+
+  const email = req.user?.email
+  if (!email) { res.status(403).json({ error: 'Acceso denegado' }); return false }
+  const personId = await resolvePersonByEmail(email)
+  if (!personId) { res.status(403).json({ error: 'Acceso denegado' }); return false }
+
+  const today = new Date().toISOString().slice(0, 10)
+  const { data: assignment } = await supabase
+    .from('project_assignment')
+    .select('id')
+    .eq('person_id', personId)
+    .eq('project_id', projectId)
+    .or(`valid_to.is.null,valid_to.gte.${today}`)
+    .limit(1)
+    .maybeSingle()
+
+  if (!assignment) {
+    res.status(403).json({ error: 'No tiene acceso a este proyecto' })
+    return false
+  }
+  return true
 }
 
 // ─── People router ────────────────────────────────────────────────────────────
@@ -201,13 +233,45 @@ peopleRouter.delete('/:id', requireAuth, requireRole('ADMIN'), async (req, res, 
 const projectsRouter = Router()
 
 // GET /api/v1/projects
+// Admin: returns all projects. Standard users: returns only their assigned projects.
 // Query: ?include_deleted=true
-projectsRouter.get('/', requireAuth, async (req, res, next) => {
+projectsRouter.get('/', requireAuth, async (req: AuthenticatedRequest, res, next) => {
   try {
+    const isAdmin = req.user?.roles?.includes('ADMIN') ?? false
     const includeDeleted = req.query['include_deleted'] === 'true'
-    let query = supabase.from('project').select('*').order('name')
-    if (!includeDeleted) query = query.is('deleted_at', null)
 
+    if (isAdmin) {
+      let query = supabase.from('project').select('*').order('name')
+      if (!includeDeleted) query = query.is('deleted_at', null)
+      const { data, error } = await query
+      if (error) throw new Error(error.message)
+      res.json({ data: data ?? [] })
+      return
+    }
+
+    // Standard user: only projects they are actively assigned to
+    const email = req.user?.email
+    if (!email) { res.json({ data: [] }); return }
+    const personId = await resolvePersonByEmail(email)
+    if (!personId) { res.json({ data: [] }); return }
+
+    const today = new Date().toISOString().slice(0, 10)
+    const { data: assignments, error: aErr } = await supabase
+      .from('project_assignment')
+      .select('project_id')
+      .eq('person_id', personId)
+      .or(`valid_to.is.null,valid_to.gte.${today}`)
+
+    if (aErr) throw new Error(aErr.message)
+
+    const projectIds = (assignments ?? []).map(
+      (a) => (a as { project_id: string }).project_id,
+    )
+
+    if (projectIds.length === 0) { res.json({ data: [] }); return }
+
+    let query = supabase.from('project').select('*').in('id', projectIds).order('name')
+    if (!includeDeleted) query = query.is('deleted_at', null)
     const { data, error } = await query
     if (error) throw new Error(error.message)
     res.json({ data: data ?? [] })
@@ -354,10 +418,8 @@ peopleRouter.get('/:personId/assignments', requireAuth, async (req, res, next) =
   }
 })
 
-// POST /api/v1/projects/:projectId/join
-// Any authenticated user can join a project within its date range.
-// percentage is set to 100 to satisfy the DB constraint (field is hidden from UI).
-projectsRouter.post('/:projectId/join', requireAuth, async (req: AuthenticatedRequest, res, next) => {
+// POST /api/v1/projects/:projectId/join — admin only
+projectsRouter.post('/:projectId/join', requireAuth, requireRole('ADMIN'), async (req: AuthenticatedRequest, res, next) => {
   try {
     const { projectId } = req.params as { projectId: string }
     const body = req.body as Record<string, unknown>
@@ -468,9 +530,8 @@ projectsRouter.get('/:projectId/my-assignment', requireAuth, async (req: Authent
   }
 })
 
-// POST /api/v1/projects/:projectId/leave
-// Sets valid_to = yesterday on the user's active assignment (shows Unirse again immediately)
-projectsRouter.post('/:projectId/leave', requireAuth, async (req: AuthenticatedRequest, res, next) => {
+// POST /api/v1/projects/:projectId/leave — admin only
+projectsRouter.post('/:projectId/leave', requireAuth, requireRole('ADMIN'), async (req: AuthenticatedRequest, res, next) => {
   try {
     const { projectId } = req.params as { projectId: string }
     const email = req.user?.email
@@ -507,10 +568,13 @@ projectsRouter.post('/:projectId/leave', requireAuth, async (req: AuthenticatedR
 })
 
 // GET /api/v1/projects/:projectId/usage
-// Returns the current user's AI usage entries for a project (all time)
+// Returns the current user's AI usage entries for a project (all time).
+// Standard users must be assigned to the project.
 projectsRouter.get('/:projectId/usage', requireAuth, async (req: AuthenticatedRequest, res, next) => {
   try {
     const { projectId } = req.params as { projectId: string }
+    if (!await verifyProjectAccess(req, res, projectId)) return
+
     const email = req.user?.email
     if (!email) { res.status(401).json({ error: 'Unauthorized' }); return }
     const personId = await resolvePersonByEmail(email)
@@ -539,9 +603,8 @@ projectsRouter.get('/:projectId/usage', requireAuth, async (req: AuthenticatedRe
   }
 })
 
-// POST /api/v1/projects/:projectId/usage
-// Logs AI hours for a project. Cost = hours × (unit_price / 160) for PER_SEAT plans.
-projectsRouter.post('/:projectId/usage', requireAuth, async (req: AuthenticatedRequest, res, next) => {
+// POST /api/v1/projects/:projectId/usage — admin only
+projectsRouter.post('/:projectId/usage', requireAuth, requireRole('ADMIN'), async (req: AuthenticatedRequest, res, next) => {
   try {
     const { projectId } = req.params as { projectId: string }
     const body = req.body as Record<string, unknown>
@@ -602,9 +665,8 @@ projectsRouter.post('/:projectId/usage', requireAuth, async (req: AuthenticatedR
   }
 })
 
-// PATCH /api/v1/projects/:projectId/usage/:usageId
-// Updates hours and recalculates cost
-projectsRouter.patch('/:projectId/usage/:usageId', requireAuth, async (req: AuthenticatedRequest, res, next) => {
+// PATCH /api/v1/projects/:projectId/usage/:usageId — admin only
+projectsRouter.patch('/:projectId/usage/:usageId', requireAuth, requireRole('ADMIN'), async (req: AuthenticatedRequest, res, next) => {
   try {
     const { projectId, usageId } = req.params as { projectId: string; usageId: string }
     const body = req.body as Record<string, unknown>
@@ -650,8 +712,8 @@ projectsRouter.patch('/:projectId/usage/:usageId', requireAuth, async (req: Auth
   }
 })
 
-// DELETE /api/v1/projects/:projectId/usage/:usageId
-projectsRouter.delete('/:projectId/usage/:usageId', requireAuth, async (req: AuthenticatedRequest, res, next) => {
+// DELETE /api/v1/projects/:projectId/usage/:usageId — admin only
+projectsRouter.delete('/:projectId/usage/:usageId', requireAuth, requireRole('ADMIN'), async (req: AuthenticatedRequest, res, next) => {
   try {
     const { projectId, usageId } = req.params as { projectId: string; usageId: string }
     const email = req.user?.email
@@ -674,10 +736,12 @@ projectsRouter.delete('/:projectId/usage/:usageId', requireAuth, async (req: Aut
 })
 
 // GET /api/v1/projects/:projectId/ai-accounts
-// Returns AI accounts used in a project, with total cost and per-period breakdown
+// Returns AI accounts used in a project, with total cost and per-period breakdown.
+// Standard users must be assigned to the project.
 projectsRouter.get('/:projectId/ai-accounts', requireAuth, async (req: AuthenticatedRequest, res, next) => {
   try {
     const { projectId } = req.params as { projectId: string }
+    if (!await verifyProjectAccess(req, res, projectId)) return
 
     const { data, error } = await supabase
       .from('usage_log')

@@ -352,9 +352,8 @@ accountsRouter.get('/mine', requireAuth, async (req: AuthenticatedRequest, res, 
   }
 })
 
-// POST /api/v1/accounts/:accountId/subscribe
-// Current user adds an AI account to their profile
-accountsRouter.post('/:accountId/subscribe', requireAuth, async (req: AuthenticatedRequest, res, next) => {
+// POST /api/v1/accounts/:accountId/subscribe — admin only
+accountsRouter.post('/:accountId/subscribe', requireAuth, requireRole('ADMIN'), async (req: AuthenticatedRequest, res, next) => {
   try {
     const { accountId } = req.params as { accountId: string }
     const personId = await resolvePersonId(req)
@@ -387,9 +386,8 @@ accountsRouter.post('/:accountId/subscribe', requireAuth, async (req: Authentica
   }
 })
 
-// DELETE /api/v1/accounts/:accountId/subscribe
-// Current user removes an AI account from their profile
-accountsRouter.delete('/:accountId/subscribe', requireAuth, async (req: AuthenticatedRequest, res, next) => {
+// DELETE /api/v1/accounts/:accountId/subscribe — admin only
+accountsRouter.delete('/:accountId/subscribe', requireAuth, requireRole('ADMIN'), async (req: AuthenticatedRequest, res, next) => {
   try {
     const { accountId } = req.params as { accountId: string }
     const personId = await resolvePersonId(req)
